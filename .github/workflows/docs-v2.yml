@@ -1,0 +1,118 @@
+name: Build and Deploy Documentation
+
+on:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install mkdocs==1.5.3 mkdocs-material==9.5.3 mkdocs-mermaid2-plugin==1.1.1 pymdown-extensions==10.7
+
+      - name: Install documentation tools
+        run: |
+          # terraform-docs
+          wget -q https://github.com/terraform-docs/terraform-docs/releases/download/v0.17.0/terraform-docs-v0.17.0-linux-amd64.tar.gz
+          tar -xzf terraform-docs-v0.17.0-linux-amd64.tar.gz
+          sudo mv terraform-docs /usr/local/bin/
+          
+          # helm-docs
+          wget -q https://github.com/norwoodj/helm-docs/releases/download/v1.13.1/helm-docs_1.13.1_Linux_x86_64.tar.gz
+          tar -xzf helm-docs_1.13.1_Linux_x86_64.tar.gz
+          sudo mv helm-docs /usr/local/bin/
+          
+          # docsible
+          pip install docsible==0.8.0
+
+      - name: Generate Terraform documentation
+        run: |
+          for dir in test-project/terraform/modules/*/; do
+            if [ -f "$dir/main.tf" ]; then
+              echo "Generating docs for: $dir"
+              terraform-docs markdown "$dir" --output-file "$dir/README.md" || true
+            fi
+          done
+
+      - name: Generate Ansible documentation
+        run: |
+          for role in test-project/ansible/roles/*/; do
+            if [ -d "$role" ]; then
+              echo "Generating docs for: $role"
+              cd "$role" && docsible || true
+              cd ${{ github.workspace }}
+            fi
+          done
+
+      - name: Generate MkDocs index files
+        run: |
+          # Crear índices directamente aquí
+          mkdir -p docs/terraform/modules docs/ansible/roles
+          
+          # Terraform index
+          echo "# Terraform" > docs/terraform/index.md
+          echo "" >> docs/terraform/index.md
+          echo "## Modulos" >> docs/terraform/index.md
+          for f in test-project/terraform/modules/*/; do
+            name=$(basename "$f")
+            if [ -f "$f/README.md" ]; then
+              cp "$f/README.md" "docs/terraform/modules/${name}.md"
+              echo "- [${name}](./modules/${name}.md)" >> docs/terraform/index.md
+            fi
+          done
+          
+          # Ansible index
+          echo "# Ansible" > docs/ansible/index.md
+          echo "" >> docs/ansible/index.md
+          echo "## Roles" >> docs/ansible/index.md
+          for f in test-project/ansible/roles/*/; do
+            name=$(basename "$f")
+            if [ -f "$f/README.md" ]; then
+              cp "$f/README.md" "docs/ansible/roles/${name}.md"
+              echo "- [${name}](./roles/${name}.md)" >> docs/ansible/index.md
+            fi
+          done
+          
+          echo "Indices generados"
+
+      - name: Build MkDocs site
+        run: mkdocs build --strict
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
