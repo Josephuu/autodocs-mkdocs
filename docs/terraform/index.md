@@ -1,15 +1,8 @@
 # Terraform
 
-Módulos de infraestructura como código para Azure.
+Modulos de infraestructura.
 
-## Módulos Disponibles
+## Modulos
 
-- [modules](./modules/modules.md) - Módulo de Terraform
-
-## Uso Rápido
-
-\`\`\`hcl
-module "ejemplo" {
-  source = "./modules/<nombre-modulo>"
-}
-\`\`\`
+- [storage](./modules/storage.md)
+- [vpc](./modules/vpc.md)

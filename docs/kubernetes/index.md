@@ -1,7 +1,7 @@
 # Kubernetes
 
-Recursos y Helm Charts para despliegues en AKS.
+Helm Charts.
 
-## Helm Charts Disponibles
+## Charts
 
-- [myapp](./helm/myapp.md) - myapp
+- [myapp](./helm/myapp.md)

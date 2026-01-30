@@ -1,12 +1,7 @@
 # Runbooks
 
-Procedimientos operacionales.
+Procedimientos.
 
-## Disaster Recovery
+## Backup
 
-\`\`\`bash
-
-# Backup PostgreSQL
-
-pg_dump -U user dbname > backup.sql
-\`\`\`
+pg_dump db > backup.sql

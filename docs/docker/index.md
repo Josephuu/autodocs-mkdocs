@@ -1,8 +1,8 @@
 # Docker
 
-Aplicaciones containerizadas.
+Apps.
 
-## Aplicaciones Disponibles
+## Apps
 
-- Backend - API Node.js
-- Frontend - React + NGINX
+- [backend](./apps/backend.md)
+- [frontend](./apps/frontend.md)

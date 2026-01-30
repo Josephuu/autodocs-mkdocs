@@ -1,8 +1,8 @@
 # Ansible
 
-Roles para configuración automatizada de servidores.
+Roles.
 
-## Roles Disponibles
+## Roles
 
-- [database](./roles/database.md) - Rol de Ansible
-- [webserver](./roles/webserver.md) - <!-- DOCSIBLE START -->
+- [database](./roles/database.md)
+- [webserver](./roles/webserver.md)
