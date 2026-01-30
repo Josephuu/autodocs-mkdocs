@@ -7,14 +7,12 @@ theme:
   name: material
   language: es
   palette:
-    # Modo claro
     - scheme: default
       primary: indigo
       accent: indigo
       toggle:
         icon: material/brightness-7
         name: Cambiar a modo oscuro
-    # Modo oscuro
     - scheme: slate
       primary: indigo
       accent: indigo
@@ -23,17 +21,16 @@ theme:
         name: Cambiar a modo claro
 
   features:
-    - navigation.instant        # Carga instantánea
-    - navigation.tracking       # Tracking de URL
-    - navigation.tabs           # Tabs superiores
-    - navigation.tabs.sticky    # Tabs siempre visibles
-    - navigation.sections       # Secciones colapsables
-    - navigation.expand         # Expandir por defecto
-    - navigation.top            # Botón "volver arriba"
-    - search.suggest            # Sugerencias de búsqueda
-    - search.highlight          # Highlight de resultados
-    - content.code.copy         # Botón copiar en código
-    - content.code.annotate     # Anotaciones en código
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
 
   icon:
     repo: fontawesome/brands/github
@@ -44,47 +41,24 @@ plugins:
       lang: es
   - mermaid2
 
-# Extensiones de Markdown
+# Extensiones
 markdown_extensions:
-  # Syntax highlighting
   - pymdownx.highlight:
       anchor_linenums: true
-      line_spans: __span
-  - pymdownx.inlinehilite
-
-  # Superfences para bloques especiales
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
-
-  # Tabs
-  - pymdownx.tabbed:
-      alternate_style: true
-
-  # Admonitions (call-outs)
+  - pymdownx.tabbed
   - admonition
   - pymdownx.details
-
-  # Listas de tareas
-  - pymdownx.tasklist:
-      custom_checkbox: true
-
-  # Emojis
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
-
-  # Otros
   - attr_list
-  - md_in_html
-  - footnotes
   - toc:
       permalink: true
       toc_depth: 3
 
-# Navegación
+# Navegación - TODOS los módulos incluidos
 nav:
   - Inicio: index.md
 
@@ -93,12 +67,16 @@ nav:
       - Módulos:
           - VPC: terraform/modules/vpc.md
           - Storage: terraform/modules/storage.md
+          - Compute: terraform/modules/compute.md
+          - AKS: terraform/modules/aks.md
 
   - Ansible:
       - ansible/index.md
       - Roles:
           - Webserver: ansible/roles/webserver.md
           - Database: ansible/roles/database.md
+          - Monitoring: ansible/roles/monitoring.md
+          - Docker: ansible/roles/docker.md
 
   - Kubernetes:
       - kubernetes/index.md
@@ -111,9 +89,6 @@ nav:
           - Backend: docker/apps/backend.md
           - Frontend: docker/apps/frontend.md
 
-  - Arquitectura:
-      - Diagramas: diagrams/terraform/dependencies.md
-
   - Runbooks:
       - runbooks/index.md
 
@@ -123,7 +98,6 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/tu-org
 
-  generator: false  # Quitar "Made with Material for MkDocs"
+  generator: false
 
-# Copyright
 copyright: Copyright &copy; 2026 DevOps Team
