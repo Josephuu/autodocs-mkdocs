@@ -20,120 +20,65 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      # ----------------------------------------
-      # 1. Checkout del código
-      # ----------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # ----------------------------------------
-      # 2. Setup Python
-      # ----------------------------------------
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # ----------------------------------------
-      # 3. Instalar dependencias
-      # ----------------------------------------
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install \
-            mkdocs==1.5.3 \
-            mkdocs-material==9.5.3 \
-            mkdocs-mermaid2-plugin==1.1.1 \
-            pymdown-extensions==10.7 \
-            mkdocs-git-revision-date-localized-plugin==1.2.2
+          pip install mkdocs==1.5.3 mkdocs-material==9.5.3 mkdocs-mermaid2-plugin==1.1.1 pymdown-extensions==10.7
 
-      # ----------------------------------------
-      # 4. Instalar herramientas de documentación
-      # ----------------------------------------
       - name: Install documentation tools
         run: |
-          # terraform-docs
           wget -q https://github.com/terraform-docs/terraform-docs/releases/download/v0.17.0/terraform-docs-v0.17.0-linux-amd64.tar.gz
-          tar -xzf terraform-docs-v0.17.0-linux-amd64.tar.gz
-          chmod +x terraform-docs
-          sudo mv terraform-docs /usr/local/bin/
-
-          # helm-docs
+          tar -xzf terraform-docs-v0.17.0-linux-amd64.tar.gz && chmod +x terraform-docs && sudo mv terraform-docs /usr/local/bin/
+          
           wget -q https://github.com/norwoodj/helm-docs/releases/download/v1.13.1/helm-docs_1.13.1_Linux_x86_64.tar.gz
-          tar -xzf helm-docs_1.13.1_Linux_x86_64.tar.gz
-          sudo mv helm-docs /usr/local/bin/
-
-          # docsible
+          tar -xzf helm-docs_1.13.1_Linux_x86_64.tar.gz && sudo mv helm-docs /usr/local/bin/
+          
           pip install docsible==0.8.0
 
-      # ----------------------------------------
-      # 5. Generar documentación
-      # ----------------------------------------
       - name: Generate Terraform documentation
         run: |
           find . -type f -name "*.tf" -path "*/modules/*" -exec dirname {} \; | sort -u | while read dir; do
             if [ -f "$dir/main.tf" ]; then
-              echo "Generating docs for: $dir"
               terraform-docs markdown "$dir" --output-file "$dir/README.md" || true
             fi
           done
 
       - name: Generate Ansible documentation
         run: |
-          for role in ansible/roles/*/; do
-            if [ -d "$role" ]; then
-              echo "Generating docs for: $role"
-              docsible generate --role-path "$role" --output-file "$role/README.md" || true
-            fi
+          for role in test-project/ansible/roles/*/; do
+            [ -d "$role" ] && docsible generate --role-path "$role" --output-file "$role/README.md" || true
           done
 
-      - name: Generate Helm documentation
-        run: |
-          for chart in kubernetes/helm/*/; do
-            if [ -f "$chart/Chart.yaml" ]; then
-              echo "Generating docs for: $chart"
-              helm-docs --chart-search-root "$(dirname "$chart")" || true
-            fi
-          done
-
-      # ----------------------------------------
-      # 5.4 Generar índices MkDocs
-      # ----------------------------------------
-      # NOTA: WORKSPACE debe apuntar al directorio del repositorio en GitHub Actions
       - name: Generate MkDocs index files
         env:
           WORKSPACE: ${{ github.workspace }}
         run: |
-          chmod +x ./generate-mkdocs-index.sh
-          ./generate-mkdocs-index.sh
+          bash ${{ github.workspace }}/generate-mkdocs-index.sh
 
-      # ----------------------------------------
-      # 6. Build del sitio MkDocs
-      # ----------------------------------------
       - name: Build MkDocs site
         run: mkdocs build --strict
 
-      # ----------------------------------------
-      # 7. Upload artifact
-      # ----------------------------------------
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./site
 
-  # --------------------------------------------
-  # 8. Deploy a GitHub Pages
-  # --------------------------------------------
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
