@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,12 +39,12 @@ jobs:
           wget -q https://github.com/terraform-docs/terraform-docs/releases/download/v0.17.0/terraform-docs-v0.17.0-linux-amd64.tar.gz
           tar -xzf terraform-docs-v0.17.0-linux-amd64.tar.gz
           sudo mv terraform-docs /usr/local/bin/
-          
+
           # helm-docs
           wget -q https://github.com/norwoodj/helm-docs/releases/download/v1.13.1/helm-docs_1.13.1_Linux_x86_64.tar.gz
           tar -xzf helm-docs_1.13.1_Linux_x86_64.tar.gz
           sudo mv helm-docs /usr/local/bin/
-          
+
           # docsible
           pip install docsible==0.8.0
 
@@ -71,7 +71,7 @@ jobs:
         run: |
           # Crear índices directamente aquí
           mkdir -p docs/terraform/modules docs/ansible/roles
-          
+
           # Terraform index
           echo "# Terraform" > docs/terraform/index.md
           echo "" >> docs/terraform/index.md
@@ -83,7 +83,7 @@ jobs:
               echo "- [${name}](./modules/${name}.md)" >> docs/terraform/index.md
             fi
           done
-          
+
           # Ansible index
           echo "# Ansible" > docs/ansible/index.md
           echo "" >> docs/ansible/index.md
@@ -95,7 +95,7 @@ jobs:
               echo "- [${name}](./roles/${name}.md)" >> docs/ansible/index.md
             fi
           done
-          
+
           echo "Indices generados"
 
       - name: Build MkDocs site

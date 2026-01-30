@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -57,29 +57,29 @@ jobs:
             if [ -d "$role" ]; then
               name=$(basename "$role")
               echo "Generating docs for: $name"
-              
+
               # Crear README.md simple para cada rol
               cat > "$role/README.md" << EOF
           # Ansible Role: $name
-          
+
           ## Descripción
-          
+
           Este rol instala y configura $name.
-          
+
           ## Variables
-          
+
           Ver \`defaults/main.yml\` para variables por defecto.
-          
+
           ## Uso
-          
+
           \`\`\`yaml
           - role: $name
             vars:
               # Variables personalizadas
           \`\`\`
-          
+
           ## Tasks
-          
+
           Ver \`tasks/main.yml\` para ver las tareas del rol.
           EOF
             fi
@@ -88,7 +88,7 @@ jobs:
       - name: Setup docs directory
         run: |
           mkdir -p docs/terraform/modules docs/ansible/roles
-          
+
           # Copiar READMEs de Terraform
           for f in test-project/terraform/modules/*/README.md; do
             if [ -f "$f" ]; then
@@ -96,7 +96,7 @@ jobs:
               cp "$f" "docs/terraform/modules/${name}.md"
             fi
           done
-          
+
           # Copiar READMEs de Ansible
           for f in test-project/ansible/roles/*/README.md; do
             if [ -f "$f" ]; then
@@ -120,7 +120,7 @@ jobs:
               echo "- [${name}](./modules/${name}.md)" >> docs/terraform/index.md
             fi
           done
-          
+
           # Ansible index
           echo "# Ansible" > docs/ansible/index.md
           echo "" >> docs/ansible/index.md
