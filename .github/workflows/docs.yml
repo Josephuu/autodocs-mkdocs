@@ -3,8 +3,6 @@ name: Build and Deploy Documentation
 on:
   push:
     branches: [main, master]
-  pull_request:
-    branches: [main, master]
 
 permissions:
   contents: read
@@ -37,18 +35,24 @@ jobs:
 
       - name: Install documentation tools
         run: |
+          # terraform-docs
           wget -q https://github.com/terraform-docs/terraform-docs/releases/download/v0.17.0/terraform-docs-v0.17.0-linux-amd64.tar.gz
-          tar -xzf terraform-docs-v0.17.0-linux-amd64.tar.gz && chmod +x terraform-docs && sudo mv terraform-docs /usr/local/bin/
+          tar -xzf terraform-docs-v0.17.0-linux-amd64.tar.gz
+          sudo mv terraform-docs /usr/local/bin/
           
+          # helm-docs
           wget -q https://github.com/norwoodj/helm-docs/releases/download/v1.13.1/helm-docs_1.13.1_Linux_x86_64.tar.gz
-          tar -xzf helm-docs_1.13.1_Linux_x86_64.tar.gz && sudo mv helm-docs /usr/local/bin/
+          tar -xzf helm-docs_1.13.1_Linux_x86_64.tar.gz
+          sudo mv helm-docs /usr/local/bin/
           
+          # docsible
           pip install docsible==0.8.0
 
       - name: Generate Terraform documentation
         run: |
-          find . -type f -name "*.tf" -path "*/modules/*" -exec dirname {} \; | sort -u | while read dir; do
+          for dir in test-project/terraform/modules/*/; do
             if [ -f "$dir/main.tf" ]; then
+              echo "Generating docs for: $dir"
               terraform-docs markdown "$dir" --output-file "$dir/README.md" || true
             fi
           done
@@ -56,14 +60,43 @@ jobs:
       - name: Generate Ansible documentation
         run: |
           for role in test-project/ansible/roles/*/; do
-            [ -d "$role" ] && docsible generate --role-path "$role" --output-file "$role/README.md" || true
+            if [ -d "$role" ]; then
+              echo "Generating docs for: $role"
+              cd "$role" && docsible || true
+              cd ${{ github.workspace }}
+            fi
           done
 
       - name: Generate MkDocs index files
-        env:
-          WORKSPACE: ${{ github.workspace }}
         run: |
-          bash ${{ github.workspace }}/generate-mkdocs-index.sh
+          # Crear índices directamente aquí
+          mkdir -p docs/terraform/modules docs/ansible/roles
+          
+          # Terraform index
+          echo "# Terraform" > docs/terraform/index.md
+          echo "" >> docs/terraform/index.md
+          echo "## Modulos" >> docs/terraform/index.md
+          for f in test-project/terraform/modules/*/; do
+            name=$(basename "$f")
+            if [ -f "$f/README.md" ]; then
+              cp "$f/README.md" "docs/terraform/modules/${name}.md"
+              echo "- [${name}](./modules/${name}.md)" >> docs/terraform/index.md
+            fi
+          done
+          
+          # Ansible index
+          echo "# Ansible" > docs/ansible/index.md
+          echo "" >> docs/ansible/index.md
+          echo "## Roles" >> docs/ansible/index.md
+          for f in test-project/ansible/roles/*/; do
+            name=$(basename "$f")
+            if [ -f "$f/README.md" ]; then
+              cp "$f/README.md" "docs/ansible/roles/${name}.md"
+              echo "- [${name}](./roles/${name}.md)" >> docs/ansible/index.md
+            fi
+          done
+          
+          echo "Indices generados"
 
       - name: Build MkDocs site
         run: mkdocs build --strict
