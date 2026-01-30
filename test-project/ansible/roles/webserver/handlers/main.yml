@@ -1,0 +1,14 @@
+---
+# =============================================================================
+# Handlers: Webserver
+# =============================================================================
+
+- name: Restart NGINX
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+
+- name: Reload NGINX
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded

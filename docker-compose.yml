@@ -1,0 +1,84 @@
+# docker-compose.complete.yml
+# Sistema completo de documentación con generación de diagramas
+
+services:
+  docs-complete:
+    build:
+      context: .
+      dockerfile: Dockerfile.complete
+    image: docs-automation:complete
+    container_name: docs-automation-complete
+    hostname: docs-complete
+
+    volumes:
+      # Montar proyecto
+      - ./:/workspace
+      # Persistir bash history
+      # - bash_history:/home/devops/.bash_history
+      # Persistir pre-commit cache
+      # - precommit_cache:/home/devops/.cache/pre-commit
+      # Persistir pip cache
+      # - pip_cache:/home/devops/.cache/pip
+      # Socket de Docker (para docker-compose-viz)
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    ports:
+      - "8001:8000"
+
+    environment:
+      - WORKSPACE=/workspace
+      - PYTHONUNBUFFERED=1
+
+    stdin_open: true
+    tty: true
+
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 512M
+
+volumes:
+  bash_history:
+    driver: local
+  precommit_cache:
+    driver: local
+  pip_cache:
+    driver: local
+
+# ==============================================================================
+# Uso:
+#
+# 1. Build y Start:
+#    docker-compose -f docker-compose.complete.yml up -d --build
+#
+# 2. Acceder:
+#    docker-compose -f docker-compose.complete.yml exec docs-complete bash
+#
+# 3. Inicializar workspace:
+#    init-workspace.sh
+#
+# 4. Generar diagramas:
+#    generate-all-diagrams.sh
+#
+# 5. Servir docs:
+#    mkdocs serve -a 0.0.0.0:8000
+#    # Abrir: http://localhost:8000
+#
+# 6. Test pre-commit:
+#    echo "# test" >> terraform/main.tf
+#    git add . && git commit -m "test"
+#    # Debería generar diagramas automáticamente
+#
+# 7. Logs:
+#    docker-compose -f docker-compose.complete.yml logs -f
+#
+# 8. Stop:
+#    docker-compose -f docker-compose.complete.yml down
+#
+# 9. Limpiar todo:
+#    docker-compose -f docker-compose.complete.yml down -v
+# ==============================================================================

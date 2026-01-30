@@ -1,0 +1,101 @@
+repos:
+  # ============================================================================
+  # Terraform - Documentación automática
+  # ============================================================================
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.88.0
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+      - id: terraform_docs
+        args:
+          - --hook-config=--path-to-file=README.md
+          - --hook-config=--add-to-existing-file=true
+          - --hook-config=--create-file-if-not-exist=true
+
+  # ============================================================================
+  # Ansible - Documentación automática
+  # ============================================================================
+  - repo: local
+    hooks:
+      - id: docsible-generate
+        name: Generate Ansible Documentation
+        entry: bash -c 'for role in ansible/roles/*/; do [ -d "$role" ] && docsible generate --role-path "$role" --output-file "$role/README.md" 2>/dev/null || true; done'
+        language: system
+        pass_filenames: false
+        files: ^ansible/roles/.*\.(yml|yaml|j2)$
+
+  # ============================================================================
+  # Kubernetes - Documentación automática
+  # ============================================================================
+  - repo: local
+    hooks:
+      - id: helm-docs-generate
+        name: Generate Helm Chart Documentation
+        entry: bash -c 'for chart in helm/charts/*/Chart.yaml; do [ -f "$chart" ] && helm-docs --chart-search-root "$(dirname $chart)" || true; done'
+        language: system
+        pass_filenames: false
+        files: ^helm/charts/.*\.(yaml|yml|tpl)$
+
+  # ============================================================================
+  # Docker - Linting
+  # ============================================================================
+  - repo: local
+    hooks:
+      - id: hadolint
+        name: Lint Dockerfiles
+        entry: hadolint
+        language: system
+        files: Dockerfile.*
+        args: ['--config', '.hadolint.yaml']
+
+  # ============================================================================
+  # GENERACIÓN DE INDEX.MD PARA MKDOCS
+  # ============================================================================
+  # IMPORTANTE: Este hook genera los archivos index.md necesarios para que
+  # MkDocs construya correctamente la navegación del sitio de documentación.
+  # Sin esto, MkDocs fallará si faltan archivos referenciados en mkdocs.yml
+  # ============================================================================
+  - repo: local
+    hooks:
+      - id: generate-mkdocs-index
+        name: Generate MkDocs Index Files
+        description: Genera automáticamente docs/*/index.md para MkDocs
+        entry: bash generate-mkdocs-index.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+        verbose: true
+
+  # ============================================================================
+  # Diagramas - Generación automática
+  # ============================================================================
+  - repo: local
+    hooks:
+      - id: generate-diagrams
+        name: Generate Architecture Diagrams
+        entry: bash -c 'generate-all-diagrams.sh'
+        language: system
+        pass_filenames: false
+        files: ^(terraform|ansible|kubernetes|helm|docker)/.*\.(tf|yml|yaml)$
+
+  # ============================================================================
+  # Markdown - Linting
+  # ============================================================================
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        args: ['--fix', '--ignore', 'node_modules']
+
+  # ============================================================================
+  # General - Limpieza
+  # ============================================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=2048']

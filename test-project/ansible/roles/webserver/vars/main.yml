@@ -1,0 +1,12 @@
+---
+# vars/main.yml - Variables with higher priority
+
+nginx_package_name: nginx
+nginx_service_name: nginx
+nginx_config_dir: /etc/nginx
+nginx_sites_available: /etc/nginx/sites-available
+nginx_sites_enabled: /etc/nginx/sites-enabled
+
+# OS-specific variables
+nginx_user: www-data
+nginx_group: www-data

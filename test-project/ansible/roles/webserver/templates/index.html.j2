@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to {{ server_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        h1 { color: #333; }
+        .info { background: #f4f4f4; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🎉 NGINX is working!</h1>
+    <div class="info">
+        <p><strong>Server:</strong> {{ server_name }}</p>
+        <p><strong>Managed by:</strong> Ansible</p>
+        <p><strong>Environment:</strong> {{ ansible_hostname }}</p>
+        <p><strong>NGINX Version:</strong> Configured via role</p>
+    </div>
+</body>
+</html>

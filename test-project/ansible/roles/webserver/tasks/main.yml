@@ -1,0 +1,56 @@
+---
+# =============================================================================
+# Tasks: Webserver (NGINX)
+# Descripción: Instala y configura NGINX como servidor web
+# =============================================================================
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_os_family == "Debian"
+
+- name: Install NGINX
+  ansible.builtin.package:
+    name: nginx
+    state: present
+
+- name: Create NGINX configuration from template
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart NGINX
+
+- name: Create site configuration
+  ansible.builtin.template:
+    src: default-site.j2
+    dest: /etc/nginx/sites-available/default
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload NGINX
+
+- name: Ensure NGINX is started and enabled
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Configure firewall for HTTP
+  ansible.builtin.ufw:
+    rule: allow
+    port: "{{ nginx_port }}"
+    proto: tcp
+  when: configure_firewall | bool
+
+- name: Configure firewall for HTTPS
+  ansible.builtin.ufw:
+    rule: allow
+    port: "{{ nginx_ssl_port }}"
+    proto: tcp
+  when:
+    - configure_firewall | bool
+    - enable_ssl | bool

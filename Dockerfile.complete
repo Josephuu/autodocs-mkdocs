@@ -1,0 +1,282 @@
+# =============================================================================
+# Dockerfile.complete - Sistema Completo de Documentación Automatizada
+# =============================================================================
+FROM ubuntu:22.04
+
+LABEL maintainer="DevOps Team"
+LABEL description="Complete documentation automation system with diagram generation"
+LABEL version="2.0"
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PYTHONUNBUFFERED=1 \
+    WORKSPACE=/workspace \
+    NODE_VERSION=20 \
+    HELM_VERSION=3.13.3 \
+    TERRAFORM_VERSION=1.7.0
+
+# =============================================================================
+# Instalación de Dependencias Base
+# =============================================================================
+RUN apt-get update && apt-get install -y \
+    build-essential pkg-config \
+    curl wget git vim nano tree jq unzip tar gzip \
+    ca-certificates gnupg lsb-release software-properties-common apt-transport-https \
+    python3 python3-pip python3-dev python3-venv \
+    graphviz graphviz-dev \
+    fonts-liberation fonts-dejavu-core \
+    docker.io \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Node.js 20.x LTS
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
+    apt-get install -y nodejs && npm install -g npm@latest
+
+# Terraform
+RUN wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+    unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+    mv terraform /usr/local/bin/ && rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+
+# Helm CLI (CORRECCIÓN CRÍTICA)
+RUN curl -fsSL https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz -o helm.tar.gz && \
+    tar -xzf helm.tar.gz && mv linux-amd64/helm /usr/local/bin/helm && \
+    rm -rf linux-amd64 helm.tar.gz
+
+# kubectl
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+    chmod +x kubectl && mv kubectl /usr/local/bin/
+
+# Python Tools
+RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip3 install --no-cache-dir \
+    pre-commit==3.6.0 docsible==0.8.0 \
+    mkdocs==1.5.3 mkdocs-material==9.5.3 mkdocs-mermaid2-plugin==1.1.1 \
+    pymdown-extensions==10.7 mkdocs-git-revision-date-localized-plugin==1.2.2 \
+    mkdocs-minify-plugin==0.8.0 pyyaml==6.0.1 ansible-core==2.15.8 \
+    diagrams==0.23.4 graphviz==0.20.1
+
+# terraform-docs
+RUN TERRAFORM_DOCS_VERSION="v0.17.0" && \
+    curl -Lo /tmp/terraform-docs.tar.gz \
+        "https://github.com/terraform-docs/terraform-docs/releases/download/${TERRAFORM_DOCS_VERSION}/terraform-docs-${TERRAFORM_DOCS_VERSION}-linux-amd64.tar.gz" && \
+    tar -xzf /tmp/terraform-docs.tar.gz -C /tmp && \
+    mv /tmp/terraform-docs /usr/local/bin/ && rm /tmp/terraform-docs.tar.gz
+
+# helm-docs
+RUN HELM_DOCS_VERSION="1.13.1" && \
+    curl -Lo /tmp/helm-docs.tar.gz \
+        "https://github.com/norwoodj/helm-docs/releases/download/v${HELM_DOCS_VERSION}/helm-docs_${HELM_DOCS_VERSION}_Linux_x86_64.tar.gz" && \
+    tar -xzf /tmp/helm-docs.tar.gz -C /tmp && \
+    mv /tmp/helm-docs /usr/local/bin/ && rm /tmp/helm-docs.tar.gz
+
+# hadolint
+RUN HADOLINT_VERSION="v2.12.0" && \
+    wget -q -O /usr/local/bin/hadolint \
+        "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" && \
+    chmod +x /usr/local/bin/hadolint
+
+# kubeval
+RUN KUBEVAL_VERSION="v0.16.1" && \
+    curl -Lo /tmp/kubeval.tar.gz \
+        "https://github.com/instrumenta/kubeval/releases/download/${KUBEVAL_VERSION}/kubeval-linux-amd64.tar.gz" && \
+    tar -xzf /tmp/kubeval.tar.gz -C /tmp && \
+    mv /tmp/kubeval /usr/local/bin/ && rm /tmp/kubeval.tar.gz
+
+# InfraMap
+RUN INFRAMAP_VERSION="v0.6.7" && \
+    curl -Lo /usr/local/bin/inframap \
+        "https://github.com/cycloidio/inframap/releases/download/${INFRAMAP_VERSION}/inframap-linux-amd64" && \
+    chmod +x /usr/local/bin/inframap
+
+# Terravision (via npm)
+RUN npm install -g @terravision/cli || echo "⚠️  Terravision opcional"
+
+# Usuario no-root
+RUN useradd -m -s /bin/bash -u 1000 devops && \
+    echo "devops ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Crear directorios ANTES de cambiar usuario
+RUN mkdir -p /home/devops/.local/scripts /home/devops/.local/bin
+
+# Script maestro: generate-all-diagrams.sh
+COPY <<'EOFSCRIPT' /home/devops/.local/scripts/generate-all-diagrams.sh
+#!/bin/bash
+set -e
+echo "🎨 Generando TODOS los diagramas..."
+mkdir -p ${WORKSPACE}/docs/diagrams/{terraform,ansible,kubernetes,docker}
+
+# Terraform
+if [ -d "${WORKSPACE}/terraform" ]; then
+    echo "📦 [1/4] Terraform..."
+    if command -v terravision &> /dev/null; then
+        find ${WORKSPACE}/terraform -name "main.tf" -not -path "*/\.*" -exec dirname {} \; | sort -u | while read module_dir; do
+            module_name=$(basename "$module_dir")
+            terravision draw --source "$module_dir" \
+                --output "${WORKSPACE}/docs/diagrams/terraform/${module_name}.svg" \
+                --provider azure 2>/dev/null && echo "  ✓ ${module_name}.svg"
+        done
+    fi
+    command -v inframap &> /dev/null && \
+        inframap generate ${WORKSPACE}/terraform/ 2>/dev/null | \
+        dot -Tsvg > ${WORKSPACE}/docs/diagrams/terraform/dependencies.svg
+fi
+
+# Ansible
+[ -d "${WORKSPACE}/ansible/roles" ] && \
+    python3 /home/devops/.local/scripts/generate-ansible-diagrams.py
+
+# Kubernetes
+[ -d "${WORKSPACE}/kubernetes" ] || [ -d "${WORKSPACE}/helm" ] && \
+    python3 /home/devops/.local/scripts/generate-k8s-diagrams.py
+
+# Docker
+find ${WORKSPACE} -name "docker-compose*.yml" 2>/dev/null | grep -q . && \
+    bash /home/devops/.local/scripts/generate-docker-diagrams.sh
+
+echo "✅ Completo: ${WORKSPACE}/docs/diagrams/"
+EOFSCRIPT
+
+# Script Ansible: generate-ansible-diagrams.py
+COPY <<'EOFSCRIPT' /home/devops/.local/scripts/generate-ansible-diagrams.py
+#!/usr/bin/env python3
+import os, yaml, sys
+def gen_mermaid(tasks):
+    m = ["```mermaid", "graph TD", "    Start([Start])"]
+    for i, t in enumerate(tasks):
+        if not isinstance(t, dict): continue
+        n = t.get('name', f'Task {i+1}').replace('"', "'")
+        m.append(f'    T{i}{{"{n}\\n[Cond]"}}' if 'when' in t else f'    T{i}["{n}"]')
+        m.append(f"    {'Start' if i==0 else f'T{i-1}'} --> T{i}")
+    m.append(f"    T{len(tasks)-1 if tasks else 0} --> End([End])")
+    m.append("```")
+    return "\n".join(m)
+roles_dir = os.environ.get('WORKSPACE', '/workspace') + '/ansible/roles'
+if os.path.exists(roles_dir):
+    for rn in os.listdir(roles_dir):
+        rp = os.path.join(roles_dir, rn)
+        tf = os.path.join(rp, 'tasks', 'main.yml')
+        if os.path.isdir(rp) and os.path.exists(tf):
+            try:
+                with open(tf) as f: data = yaml.safe_load(f)
+                if data:
+                    with open(os.path.join(rp, 'TASK-FLOW.md'), 'w') as f:
+                        f.write(f"# Task Flow - {rn}\n\n{gen_mermaid(data)}")
+                    print(f"  ✓ {rn}/TASK-FLOW.md")
+            except: pass
+EOFSCRIPT
+
+# Script Kubernetes: generate-k8s-diagrams.py
+COPY <<'EOFSCRIPT' /home/devops/.local/scripts/generate-k8s-diagrams.py
+#!/usr/bin/env python3
+import os, sys
+try:
+    from diagrams import Cluster, Diagram
+    from diagrams.k8s.compute import Pod
+    from diagrams.k8s.network import Ingress, Service
+    from diagrams.azure.compute import KubernetesServices
+except ImportError:
+    print("❌ diagrams no instalado"); sys.exit(1)
+ws = os.environ.get('WORKSPACE', '/workspace')
+od = os.path.join(ws, 'docs/diagrams/kubernetes')
+os.makedirs(od, exist_ok=True)
+with Diagram("AKS Cluster", filename=os.path.join(od, "aks-overview"), show=False):
+    aks = KubernetesServices("AKS")
+    with Cluster("Production"):
+        ing = Ingress("Ingress")
+        svc = Service("Service")
+        pods = [Pod(f"pod-{i}") for i in range(1,4)]
+    aks >> ing >> svc >> pods
+print("  ✓ aks-overview.png")
+EOFSCRIPT
+
+# Script Docker: generate-docker-diagrams.sh
+COPY <<'EOFSCRIPT' /home/devops/.local/scripts/generate-docker-diagrams.sh
+#!/bin/bash
+set -e
+WS=${WORKSPACE:-/workspace}
+DD="${WS}/docs/diagrams/docker"
+mkdir -p "$DD"
+find ${WS} -name "docker-compose*.yml" | while read cf; do
+    fn=$(basename "$cf" .yml)
+    command -v docker &> /dev/null && \
+        docker run --rm -v "${WS}:/input" pmsipilot/docker-compose-viz \
+        render -m image "/input/${cf#${WS}/}" \
+        --output-file="/input/docs/diagrams/docker/${fn}.png" --force 2>/dev/null && \
+        echo "  ✓ ${fn}.png"
+done
+EOFSCRIPT
+
+# Script de inicialización: init-workspace.sh
+COPY <<'EOFSCRIPT' /home/devops/.local/bin/init-workspace.sh
+#!/bin/bash
+set -e
+WS=${WORKSPACE:-/workspace}
+echo "🚀 Inicializando workspace: $WS"
+[ ! -d "$WS" ] && echo "❌ $WS no existe" && exit 1
+cd "$WS"
+mkdir -p docs/diagrams/{terraform,ansible,kubernetes,docker} docs/{architecture,runbooks}
+[ ! -f .pre-commit-config.yaml ] && cp /home/devops/.pre-commit-config-template.yaml .pre-commit-config.yaml
+[ ! -d .git ] && git init && git config user.email "devops@example.com" && git config user.name "DevOps"
+[ -f .pre-commit-config.yaml ] && pre-commit install
+[ ! -f mkdocs.yml ] && cat > mkdocs.yml << 'EOFMKDOCS'
+site_name: Docs DevOps
+theme:
+  name: material
+  language: es
+  features: [navigation.instant, navigation.tabs, search.suggest]
+plugins: [{search: {lang: es}}, mermaid2]
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences: [{name: mermaid, class: mermaid}]
+  - admonition
+nav: [Inicio: index.md, Terraform: terraform/, Ansible: ansible/]
+EOFMKDOCS
+[ ! -f docs/index.md ] && echo -e "# Docs\n\n## Diagramas\nVer docs/diagrams/" > docs/index.md
+echo "✅ Listo! Usa: generate-all-diagrams.sh"
+EOFSCRIPT
+
+# Template pre-commit
+COPY <<'EOFPC' /home/devops/.pre-commit-config-template.yaml
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.88.0
+    hooks:
+      - id: terraform_docs
+        args: [--hook-config=--path-to-file=README.md, --hook-config=--add-to-existing-file=true]
+  - repo: local
+    hooks:
+      - id: generate-diagrams
+        name: Generate Diagrams
+        entry: bash /home/devops/.local/scripts/generate-all-diagrams.sh
+        language: system
+        pass_filenames: false
+        files: '\.(tf|yml|yaml)$'
+EOFPC
+
+# Cambiar permisos y ownership (mientras aún somos root)
+RUN chmod +x /home/devops/.local/scripts/*.sh \
+             /home/devops/.local/scripts/*.py \
+             /home/devops/.local/bin/*.sh && \
+    chown -R devops:devops /home/devops/.local
+
+# Ahora cambiar a usuario devops
+USER devops
+WORKDIR /home/devops
+
+ENV PATH="/home/devops/.local/bin:/home/devops/.local/scripts:${PATH}"
+
+HEALTHCHECK --interval=30s --timeout=3s CMD terraform-docs --version && helm version && echo "✅ OK"
+
+EXPOSE 8000
+
+# Mensaje bienvenida
+RUN echo 'echo "════════════════════════════════════════"' >> /home/devops/.bashrc && \
+    echo 'echo "  Docs Automation v2.0 + Diagrams"' >> /home/devops/.bashrc && \
+    echo 'echo "════════════════════════════════════════"' >> /home/devops/.bashrc && \
+    echo 'echo "🎨 generate-all-diagrams.sh - Generar diagramas"' >> /home/devops/.bashrc && \
+    echo 'echo "🚀 init-workspace.sh - Setup proyecto"' >> /home/devops/.bashrc && \
+    echo 'echo "════════════════════════════════════════"' >> /home/devops/.bashrc
+
+WORKDIR ${WORKSPACE}
+CMD ["/bin/bash"]

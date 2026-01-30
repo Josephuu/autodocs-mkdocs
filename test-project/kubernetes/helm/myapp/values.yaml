@@ -1,0 +1,169 @@
+# Default values for myapp
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- Number of replicas for the deployment
+replicaCount: 3
+
+image:
+  # -- Container image repository
+  repository: myregistry.azurecr.io/myapp
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+  # -- Image tag (overrides the image tag whose default is the chart appVersion)
+  tag: ""
+
+# -- Image pull secrets for private registries
+imagePullSecrets: []
+  # - name: myregistrykey
+
+# -- String to partially override myapp.fullname template
+nameOverride: ""
+# -- String to fully override myapp.fullname template
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use (if not set and create is true, a name is generated)
+  name: ""
+
+# -- Annotations to add to the pod
+podAnnotations: {}
+
+# -- Labels to add to the pod
+podLabels:
+  app: myapp
+  version: v1
+
+# -- Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+# -- Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+
+service:
+  # -- Service type (ClusterIP, NodePort, LoadBalancer)
+  type: ClusterIP
+  # -- Service port
+  port: 80
+  # -- Target container port
+  targetPort: 8080
+  # -- Service annotations
+  annotations: {}
+
+ingress:
+  # -- Enable ingress resource
+  enabled: true
+  # -- Ingress class name
+  className: "nginx"
+  # -- Ingress annotations
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  # -- Ingress hosts configuration
+  hosts:
+    - host: myapp.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  # -- Ingress TLS configuration
+  tls:
+    - secretName: myapp-tls
+      hosts:
+        - myapp.example.com
+
+# -- Resource limits and requests
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+# -- Liveness probe configuration
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# -- Readiness probe configuration
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+autoscaling:
+  # -- Enable horizontal pod autoscaler
+  enabled: true
+  # -- Minimum number of replicas
+  minReplicas: 2
+  # -- Maximum number of replicas
+  maxReplicas: 10
+  # -- Target CPU utilization percentage
+  targetCPUUtilizationPercentage: 80
+  # -- Target memory utilization percentage
+  targetMemoryUtilizationPercentage: 80
+
+# -- Node selector for pod assignment
+nodeSelector: {}
+
+# -- Tolerations for pod assignment
+tolerations: []
+
+# -- Affinity rules for pod assignment
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - myapp
+          topologyKey: kubernetes.io/hostname
+
+# Application-specific configuration
+config:
+  # -- Environment (development, staging, production)
+  environment: production
+  # -- Log level (debug, info, warn, error)
+  logLevel: info
+  # -- Database connection string (use secret in production)
+  databaseUrl: ""
+  # -- Redis connection string
+  redisUrl: ""
+  # -- Feature flags
+  featureFlags:
+    newUI: true
+    betaFeatures: false
+
+# Secret configuration (mount as environment variables)
+secrets:
+  # -- Create secret from values
+  create: true
+  # -- Secret data (base64 encoded in actual deployment)
+  data:
+    API_KEY: ""
+    JWT_SECRET: ""

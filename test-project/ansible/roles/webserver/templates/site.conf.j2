@@ -1,0 +1,56 @@
+# {{ ansible_managed }}
+# Site Configuration for {{ server_name }}
+
+server {
+    listen {{ nginx_port }};
+    server_name {{ server_name }};
+
+    root {{ document_root }};
+    index index.html index.htm;
+
+    {% if security_headers_enabled %}
+    # Security Headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    {% if hsts_enabled %}
+    add_header Strict-Transport-Security "max-age={{ hsts_max_age }}" always;
+    {% endif %}
+    {% endif %}
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Custom error pages
+    {% for code, page in custom_error_pages.items() %}
+    error_page {{ code }} {{ page }};
+    {% endfor %}
+
+    # Deny access to hidden files
+    location ~ /\. {
+        deny all;
+    }
+}
+
+{% if ssl_enabled %}
+server {
+    listen {{ nginx_ssl_port }} ssl;
+    server_name {{ server_name }};
+
+    ssl_certificate {{ ssl_certificate_path }};
+    ssl_certificate_key {{ ssl_certificate_key_path }};
+
+    root {{ document_root }};
+    index index.html index.htm;
+
+    # SSL Configuration
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+{% endif %}

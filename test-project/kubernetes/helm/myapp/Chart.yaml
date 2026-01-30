@@ -1,0 +1,36 @@
+apiVersion: v2
+name: myapp
+description: A Helm chart for deploying MyApp on Kubernetes
+type: application
+
+# Chart version
+version: 1.0.0
+
+# Application version
+appVersion: "1.0.0"
+
+# Metadata
+keywords:
+  - webapp
+  - kubernetes
+  - helm
+home: https://github.com/yourcompany/myapp
+sources:
+  - https://github.com/yourcompany/myapp
+
+maintainers:
+  - name: DevOps Team
+    email: devops@company.com
+    url: https://yourcompany.com
+
+# Dependencies (example)
+# dependencies:
+#   - name: postgresql
+#     version: "12.x.x"
+#     repository: "https://charts.bitnami.com/bitnami"
+#     condition: postgresql.enabled
+
+# Chart annotations
+annotations:
+  category: WebApplication
+  licenses: Apache-2.0
