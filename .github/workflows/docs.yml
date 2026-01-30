@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install mkdocs==1.5.3 mkdocs-material==9.5.3 mkdocs-mermaid2-plugin==1.1.1 pymdown-extensions==10.7
+          pip install mkdocs==1.5.3 mkdocs-material==9.5.3  pymdown-extensions==10.7
 
       - name: Install documentation tools
         run: |
