@@ -39,45 +39,52 @@ jobs:
           tar -xzf terraform-docs-v0.17.0-linux-amd64.tar.gz
           sudo mv terraform-docs /usr/local/bin/
 
-      - name: Generate Terraform docs
+      - name: Generate Terraform docs and copy to docs/
         run: |
-          # Generar READMEs en los modulos
+          # Generar READMEs en los módulos
           for dir in test-project/terraform/modules/*/; do
             if [ -f "$dir/main.tf" ]; then
               echo "Processing: $dir"
               (cd "$dir" && terraform-docs markdown . --output-file README.md) || true
             fi
           done
-
-      - name: Copy docs to site
-        run: |
-          # Crear estructura de docs
-          mkdir -p docs/terraform/modules docs/ansible/roles
           
-          # Copiar READMEs de Terraform
+          # Copiar a docs/
+          mkdir -p docs/terraform/modules docs/ansible/roles
           for f in test-project/terraform/modules/*/README.md; do
             if [ -f "$f" ]; then
               name=$(basename $(dirname "$f"))
               cp "$f" "docs/terraform/modules/${name}.md"
-              echo "Copied Terraform: ${name}.md"
+              echo "Copied: ${name}.md"
             fi
           done
+
+      - name: Generate Ansible docs
+        run: |
+          mkdir -p docs/ansible/roles
+          for role in test-project/ansible/roles/*/; do
+            if [ -d "$role" ]; then
+              name=$(basename "$role")
+              cat > "docs/ansible/roles/${name}.md" << EOF
+          # Ansible Role: $name
           
-          # Copiar READMEs de Ansible
-          for f in test-project/ansible/roles/*/README.md; do
-            if [ -f "$f" ]; then
-              name=$(basename $(dirname "$f"))
-              cp "$f" "docs/ansible/roles/${name}.md"
-              echo "Copied Ansible: ${name}.md"
+          Este rol configura $name.
+          
+          ## Uso
+          
+          \`\`\`yaml
+          - role: $name
+          \`\`\`
+          EOF
             fi
           done
 
       - name: Generate index files
         run: |
           # Terraform index
-          echo "# Terraform Modules" > docs/terraform/index.md
+          echo "# Terraform" > docs/terraform/index.md
           echo "" >> docs/terraform/index.md
-          echo "Modulos de infraestructura como codigo." >> docs/terraform/index.md
+          echo "## Modulos" >> docs/terraform/index.md
           echo "" >> docs/terraform/index.md
           for f in docs/terraform/modules/*.md; do
             if [ -f "$f" ]; then
@@ -87,9 +94,9 @@ jobs:
           done
           
           # Ansible index
-          echo "# Ansible Roles" > docs/ansible/index.md
+          echo "# Ansible" > docs/ansible/index.md
           echo "" >> docs/ansible/index.md
-          echo "Roles para configuracion de servidores." >> docs/ansible/index.md
+          echo "## Roles" >> docs/ansible/index.md
           echo "" >> docs/ansible/index.md
           for f in docs/ansible/roles/*.md; do
             if [ -f "$f" ]; then
