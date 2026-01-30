@@ -1,212 +1,132 @@
 #!/bin/bash
-# =============================================================================
-# Genera automáticamente los archivos index.md para MkDocs
-# 
-# Uso:
-#   WORKSPACE=/ruta/al/repo ./generate-mkdocs-index.sh
-# 
-# En GitHub Actions:
-#   WORKSPACE: ${{ github.workspace }}
-# =============================================================================
-
 set -e
 
-WS="${WORKSPACE:-/workspace}"
+WS="${WORKSPACE:-$(pwd)}"
 DOCS_DIR="${WS}/docs"
 
-echo "📑 Generando index.md para MkDocs..."
-echo "   WORKSPACE: ${WS}"
-echo "   DOCS_DIR: ${DOCS_DIR}"
-
+echo "Generando index.md..."
 mkdir -p "${DOCS_DIR}"
 
-# =============================================================================
-# Terraform
-# =============================================================================
 generate_terraform_index() {
     local OUTPUT="${DOCS_DIR}/terraform/index.md"
     mkdir -p "$(dirname "$OUTPUT")"
-    
     echo "# Terraform" > "$OUTPUT"
     echo "" >> "$OUTPUT"
-    echo "Módulos de infraestructura como código para Azure." >> "$OUTPUT"
+    echo "Modulos de infraestructura." >> "$OUTPUT"
     echo "" >> "$OUTPUT"
-    echo "## Módulos Disponibles" >> "$OUTPUT"
+    echo "## Modulos" >> "$OUTPUT"
     echo "" >> "$OUTPUT"
-
-    # Buscar módulos documentados en docs/terraform/modules/
     local MODULES_DIR="${DOCS_DIR}/terraform/modules"
-    
     if [ -d "$MODULES_DIR" ]; then
         local found=false
         for md_file in "$MODULES_DIR"/*.md; do
-            if [ -f "$md_file" ]; then
-                local module_name=$(basename "$md_file" .md)
-                echo "- [${module_name}](./modules/${module_name}.md) - Módulo de Terraform" >> "$OUTPUT"
-                found=true
-            fi
+            [ -f "$md_file" ] || continue
+            local name=$(basename "$md_file" .md)
+            echo "- [${name}](./modules/${name}.md)" >> "$OUTPUT"
+            found=true
         done
-        
-        if [ "$found" = false ]; then
-            echo "- No hay módulos documentados aún" >> "$OUTPUT"
-        fi
+        [ "$found" = false ] && echo "- Sin modulos" >> "$OUTPUT"
     else
-        echo "- No hay módulos documentados aún" >> "$OUTPUT"
+        echo "- Sin modulos" >> "$OUTPUT"
     fi
-
-    echo "" >> "$OUTPUT"
-    echo "## Uso Rápido" >> "$OUTPUT"
-    echo "" >> "$OUTPUT"
-    echo '```hcl' >> "$OUTPUT"
-    echo 'module "ejemplo" {' >> "$OUTPUT"
-    echo '  source = "./modules/<nombre-modulo>"' >> "$OUTPUT"
-    echo '}' >> "$OUTPUT"
-    echo '```' >> "$OUTPUT"
-
-    echo "  ✓ ${OUTPUT}"
+    echo "  OK: terraform/index.md"
 }
 
-# =============================================================================
-# Ansible
-# =============================================================================
 generate_ansible_index() {
     local OUTPUT="${DOCS_DIR}/ansible/index.md"
     mkdir -p "$(dirname "$OUTPUT")"
-    
     echo "# Ansible" > "$OUTPUT"
     echo "" >> "$OUTPUT"
-    echo "Roles para configuración automatizada de servidores." >> "$OUTPUT"
+    echo "Roles." >> "$OUTPUT"
     echo "" >> "$OUTPUT"
-    echo "## Roles Disponibles" >> "$OUTPUT"
+    echo "## Roles" >> "$OUTPUT"
     echo "" >> "$OUTPUT"
-
     local ROLES_DIR="${DOCS_DIR}/ansible/roles"
-    
     if [ -d "$ROLES_DIR" ]; then
         local found=false
         for md_file in "$ROLES_DIR"/*.md; do
-            if [ -f "$md_file" ]; then
-                local role_name=$(basename "$md_file" .md)
-                echo "- [${role_name}](./roles/${role_name}.md) - Rol de Ansible" >> "$OUTPUT"
-                found=true
-            fi
+            [ -f "$md_file" ] || continue
+            local name=$(basename "$md_file" .md)
+            echo "- [${name}](./roles/${name}.md)" >> "$OUTPUT"
+            found=true
         done
-        
-        if [ "$found" = false ]; then
-            echo "- No hay roles documentados aún" >> "$OUTPUT"
-        fi
+        [ "$found" = false ] && echo "- Sin roles" >> "$OUTPUT"
     else
-        echo "- No hay roles documentados aún" >> "$OUTPUT"
+        echo "- Sin roles" >> "$OUTPUT"
     fi
-
-    echo "  ✓ ${OUTPUT}"
+    echo "  OK: ansible/index.md"
 }
 
-# =============================================================================
-# Kubernetes
-# =============================================================================
 generate_kubernetes_index() {
     local OUTPUT="${DOCS_DIR}/kubernetes/index.md"
     mkdir -p "$(dirname "$OUTPUT")"
-    
     echo "# Kubernetes" > "$OUTPUT"
     echo "" >> "$OUTPUT"
-    echo "Recursos y Helm Charts para despliegues en AKS." >> "$OUTPUT"
+    echo "Helm Charts." >> "$OUTPUT"
     echo "" >> "$OUTPUT"
-    echo "## Helm Charts Disponibles" >> "$OUTPUT"
+    echo "## Charts" >> "$OUTPUT"
     echo "" >> "$OUTPUT"
-
     local CHARTS_DIR="${DOCS_DIR}/kubernetes/helm"
-    
     if [ -d "$CHARTS_DIR" ]; then
         local found=false
         for md_file in "$CHARTS_DIR"/*.md; do
-            if [ -f "$md_file" ]; then
-                local chart_name=$(basename "$md_file" .md)
-                echo "- [${chart_name}](./helm/${chart_name}.md) - Helm Chart" >> "$OUTPUT"
-                found=true
-            fi
+            [ -f "$md_file" ] || continue
+            local name=$(basename "$md_file" .md)
+            echo "- [${name}](./helm/${name}.md)" >> "$OUTPUT"
+            found=true
         done
-        
-        if [ "$found" = false ]; then
-            echo "- No hay charts documentados aún" >> "$OUTPUT"
-        fi
+        [ "$found" = false ] && echo "- Sin charts" >> "$OUTPUT"
     else
-        echo "- No hay charts documentados aún" >> "$OUTPUT"
+        echo "- Sin charts" >> "$OUTPUT"
     fi
-
-    echo "  ✓ ${OUTPUT}"
+    echo "  OK: kubernetes/index.md"
 }
 
-# =============================================================================
-# Docker
-# =============================================================================
 generate_docker_index() {
     local OUTPUT="${DOCS_DIR}/docker/index.md"
     mkdir -p "$(dirname "$OUTPUT")"
-    
     echo "# Docker" > "$OUTPUT"
     echo "" >> "$OUTPUT"
-    echo "Aplicaciones containerizadas." >> "$OUTPUT"
+    echo "Apps." >> "$OUTPUT"
     echo "" >> "$OUTPUT"
-    echo "## Aplicaciones Disponibles" >> "$OUTPUT"
+    echo "## Apps" >> "$OUTPUT"
     echo "" >> "$OUTPUT"
-
     local APPS_DIR="${DOCS_DIR}/docker/apps"
-    
     if [ -d "$APPS_DIR" ]; then
         local found=false
         for md_file in "$APPS_DIR"/*.md; do
-            if [ -f "$md_file" ]; then
-                local app_name=$(basename "$md_file" .md)
-                echo "- [${app_name}](./apps/${app_name}.md) - Aplicación Docker" >> "$OUTPUT"
-                found=true
-            fi
+            [ -f "$md_file" ] || continue
+            local name=$(basename "$md_file" .md)
+            echo "- [${name}](./apps/${name}.md)" >> "$OUTPUT"
+            found=true
         done
-        
-        if [ "$found" = false ]; then
-            echo "- No hay aplicaciones documentadas aún" >> "$OUTPUT"
-        fi
+        [ "$found" = false ] && echo "- Sin apps" >> "$OUTPUT"
     else
-        echo "- No hay aplicaciones documentadas aún" >> "$OUTPUT"
+        echo "- Sin apps" >> "$OUTPUT"
     fi
-
-    echo "  ✓ ${OUTPUT}"
+    echo "  OK: docker/index.md"
 }
 
-# =============================================================================
-# Runbooks
-# =============================================================================
 generate_runbooks_index() {
     local OUTPUT="${DOCS_DIR}/runbooks/index.md"
     mkdir -p "$(dirname "$OUTPUT")"
-    
     echo "# Runbooks" > "$OUTPUT"
     echo "" >> "$OUTPUT"
-    echo "Procedimientos operacionales." >> "$OUTPUT"
+    echo "Procedimientos." >> "$OUTPUT"
     echo "" >> "$OUTPUT"
-    echo "## Disaster Recovery" >> "$OUTPUT"
+    echo "## Backup" >> "$OUTPUT"
     echo "" >> "$OUTPUT"
-    echo '```bash' >> "$OUTPUT"
-    echo '# Backup PostgreSQL' >> "$OUTPUT"
-    echo 'pg_dump -U user dbname > backup.sql' >> "$OUTPUT"
-    echo '```' >> "$OUTPUT"
-
-    echo "  ✓ ${OUTPUT}"
+    echo 'pg_dump db > backup.sql' >> "$OUTPUT"
+    echo "  OK: runbooks/index.md"
 }
 
-# =============================================================================
-# Main
-# =============================================================================
-echo "═══════════════════════════════════════════"
-echo "  Generando índices para MkDocs"
-echo "═══════════════════════════════════════════"
-
+echo "=================================="
+echo "  Generando indices"
+echo "=================================="
 generate_terraform_index
 generate_ansible_index
 generate_kubernetes_index
 generate_docker_index
 generate_runbooks_index
-
 echo ""
-echo "✅ Índices generados correctamente"
+echo "Listo"
