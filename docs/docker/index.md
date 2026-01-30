@@ -1,8 +1,5 @@
 # Docker
 
-Apps.
+Aplicaciones containerizadas.
 
 ## Apps
-
-- [backend](./apps/backend.md)
-- [frontend](./apps/frontend.md)

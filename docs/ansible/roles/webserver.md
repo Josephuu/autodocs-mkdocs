@@ -2,22 +2,20 @@
 
 Configura NGINX como servidor web.
 
-## Requisitos
-
-- Ubuntu 20.04+
-- Python 3
-
 ## Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| nginx_port | 80 | Puerto HTTP |
-| nginx_worker_processes | auto | Procesos workers |
+Ver archivo defaults/main.yml para variables.
 
-## Ejemplo
+## Uso
 
 ```yaml
 - role: webserver
   vars:
-    nginx_port: 8080
+    nginx_port: 80
 ```
+
+## Tasks
+
+- Instalar NGINX
+- Configurar sitio  
+- Iniciar servicio

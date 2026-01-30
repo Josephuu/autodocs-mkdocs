@@ -1,7 +1,5 @@
 # Kubernetes
 
-Helm Charts.
+Helm Charts para AKS.
 
 ## Charts
-
-- [myapp](./helm/myapp.md)
