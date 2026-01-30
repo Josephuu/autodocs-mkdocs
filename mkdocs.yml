@@ -9,11 +9,7 @@ theme:
     - scheme: default
       primary: indigo
       accent: indigo
-    - scheme: slate
-      primary: indigo
-      accent: indigo
   features:
-    - navigation.instant
     - navigation.tabs
     - search.suggest
     - content.code.copy
@@ -21,14 +17,10 @@ theme:
 plugins:
   - search:
       lang: es
-  - mermaid2
 
 markdown_extensions:
   - pymdownx.highlight
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
+  - pymdownx.superfences
   - admonition
   - toc:
       permalink: true
@@ -60,7 +52,6 @@ nav:
 
   - Diagramas:
       - diagrams/index.md
-      - Infraestructura: diagrams/terraform/infrastructure-overview.md
 
   - Runbooks:
       - runbooks/index.md
