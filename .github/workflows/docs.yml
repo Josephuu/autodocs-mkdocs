@@ -98,7 +98,13 @@ jobs:
             fi
           done
 
+      # ----------------------------------------
+      # 5.4 Generar índices MkDocs
+      # ----------------------------------------
+      # NOTA: WORKSPACE debe apuntar al directorio del repositorio en GitHub Actions
       - name: Generate MkDocs index files
+        env:
+          WORKSPACE: ${{ github.workspace }}
         run: |
           chmod +x ./generate-mkdocs-index.sh
           ./generate-mkdocs-index.sh
