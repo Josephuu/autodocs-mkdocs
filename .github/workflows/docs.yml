@@ -31,77 +31,51 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install mkdocs==1.5.3 mkdocs-material==9.5.3  pymdown-extensions==10.7
+          pip install mkdocs==1.5.3 mkdocs-material==9.5.3 pymdown-extensions==10.7
 
-      - name: Install documentation tools
+      - name: Install terraform-docs
         run: |
-          # terraform-docs
           wget -q https://github.com/terraform-docs/terraform-docs/releases/download/v0.17.0/terraform-docs-v0.17.0-linux-amd64.tar.gz
           tar -xzf terraform-docs-v0.17.0-linux-amd64.tar.gz
           sudo mv terraform-docs /usr/local/bin/
 
-      - name: Generate Terraform documentation
+      - name: Generate Terraform docs and copy to docs/
         run: |
-          cd test-project/terraform/modules
-          for dir in */; do
+          # Generar READMEs en los módulos
+          for dir in test-project/terraform/modules/*/; do
             if [ -f "$dir/main.tf" ]; then
-              echo "Generating docs for: $dir"
+              echo "Processing: $dir"
               (cd "$dir" && terraform-docs markdown . --output-file README.md) || true
             fi
           done
-          cd ${{ github.workspace }}
+          
+          # Copiar a docs/
+          mkdir -p docs/terraform/modules docs/ansible/roles
+          for f in test-project/terraform/modules/*/README.md; do
+            if [ -f "$f" ]; then
+              name=$(basename $(dirname "$f"))
+              cp "$f" "docs/terraform/modules/${name}.md"
+              echo "Copied: ${name}.md"
+            fi
+          done
 
-      - name: Generate simple Ansible docs
+      - name: Generate Ansible docs
         run: |
+          mkdir -p docs/ansible/roles
           for role in test-project/ansible/roles/*/; do
             if [ -d "$role" ]; then
               name=$(basename "$role")
-              echo "Generating docs for: $name"
-              
-              # Crear README.md simple para cada rol
-              cat > "$role/README.md" << EOF
+              cat > "docs/ansible/roles/${name}.md" << EOF
           # Ansible Role: $name
           
-          ## Descripción
-          
-          Este rol instala y configura $name.
-          
-          ## Variables
-          
-          Ver \`defaults/main.yml\` para variables por defecto.
+          Este rol configura $name.
           
           ## Uso
           
           \`\`\`yaml
           - role: $name
-            vars:
-              # Variables personalizadas
           \`\`\`
-          
-          ## Tasks
-          
-          Ver \`tasks/main.yml\` para ver las tareas del rol.
           EOF
-            fi
-          done
-
-      - name: Setup docs directory
-        run: |
-          mkdir -p docs/terraform/modules docs/ansible/roles
-          
-          # Copiar READMEs de Terraform
-          for f in test-project/terraform/modules/*/README.md; do
-            if [ -f "$f" ]; then
-              name=$(basename $(dirname "$f"))
-              cp "$f" "docs/terraform/modules/${name}.md"
-            fi
-          done
-          
-          # Copiar READMEs de Ansible
-          for f in test-project/ansible/roles/*/README.md; do
-            if [ -f "$f" ]; then
-              name=$(basename $(dirname "$f"))
-              cp "$f" "docs/ansible/roles/${name}.md"
             fi
           done
 
@@ -110,9 +84,7 @@ jobs:
           # Terraform index
           echo "# Terraform" > docs/terraform/index.md
           echo "" >> docs/terraform/index.md
-          echo "Módulos de infraestructura." >> docs/terraform/index.md
-          echo "" >> docs/terraform/index.md
-          echo "## Módulos" >> docs/terraform/index.md
+          echo "## Modulos" >> docs/terraform/index.md
           echo "" >> docs/terraform/index.md
           for f in docs/terraform/modules/*.md; do
             if [ -f "$f" ]; then
@@ -123,8 +95,6 @@ jobs:
           
           # Ansible index
           echo "# Ansible" > docs/ansible/index.md
-          echo "" >> docs/ansible/index.md
-          echo "Roles de configuración." >> docs/ansible/index.md
           echo "" >> docs/ansible/index.md
           echo "## Roles" >> docs/ansible/index.md
           echo "" >> docs/ansible/index.md
