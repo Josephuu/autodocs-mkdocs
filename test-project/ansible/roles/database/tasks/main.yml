@@ -1,0 +1,35 @@
+---
+# PostgreSQL Database Role
+- name: Install PostgreSQL
+  ansible.builtin.package:
+    name: postgresql
+    state: present
+
+- name: Start and enable PostgreSQL
+  ansible.builtin.service:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Create database
+  ansible.builtin.postgresql_db:
+    name: "{{ db_name }}"
+    state: present
+  become: true
+  become_user: postgres
+
+- name: Create database user
+  ansible.builtin.postgresql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    db: "{{ db_name }}"
+    priv: ALL
+    state: present
+  become: true
+  become_user: postgres
+
+- name: Configure pg_hba for remote access
+  ansible.builtin.template:
+    src: pg_hba.conf.j2
+    dest: /etc/postgresql/14/main/pg_hba.conf
+  notify: Restart PostgreSQL

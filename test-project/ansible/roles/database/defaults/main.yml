@@ -1,0 +1,7 @@
+---
+# Default variables for database
+db_name: myapp
+db_user: appuser
+db_password: changeme
+db_port: 5432
+postgresql_version: "14"

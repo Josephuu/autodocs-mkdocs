@@ -1,0 +1,38 @@
+---
+# Monitoring Stack
+- name: Create monitoring directory
+  ansible.builtin.file:
+    path: /opt/monitoring
+    state: directory
+    mode: '0755'
+
+- name: Deploy Prometheus
+  community.docker.docker_container:
+    name: prometheus
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - /opt/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    restart_policy: always
+    state: started
+
+- name: Deploy Grafana
+  community.docker.docker_container:
+    name: grafana
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    env:
+      GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"
+    restart_policy: always
+    state: started
+
+- name: Deploy Node Exporter
+  community.docker.docker_container:
+    name: node-exporter
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+    restart_policy: always
+    state: started
