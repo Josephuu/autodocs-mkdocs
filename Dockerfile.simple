@@ -1,0 +1,72 @@
+# =============================================================================
+# Dockerfile.simple - Contenedor Ligero para Desarrollo
+# 
+# Este contenedor está optimizado para desarrollo local.
+# La generación de documentación se hace en GitHub Actions.
+# =============================================================================
+FROM ubuntu:22.04
+
+LABEL maintainer="DevOps Team"
+LABEL description="Lightweight development container for documentation"
+LABEL version="3.0"
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PYTHONUNBUFFERED=1 \
+    WORKSPACE=/workspace
+
+# =============================================================================
+# Instalación de Dependencias Base
+# =============================================================================
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    vim \
+    nano \
+    python3 \
+    python3-pip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# =============================================================================
+# Python Tools (solo lo esencial)
+# =============================================================================
+RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip3 install --no-cache-dir \
+    pre-commit==3.6.0 \
+    mkdocs==1.5.3 \
+    mkdocs-material==9.5.3 \
+    pymdown-extensions==10.7
+
+# =============================================================================
+# Usuario no-root
+# =============================================================================
+RUN useradd -m -s /bin/bash -u 1000 devops && \
+    echo "devops ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    mkdir -p /workspace && \
+    chown -R devops:devops /workspace
+
+USER devops
+WORKDIR /workspace
+
+ENV PATH="/home/devops/.local/bin:${PATH}"
+
+# =============================================================================
+# Mensaje de bienvenida
+# =============================================================================
+RUN echo 'echo "════════════════════════════════════════"' >> /home/devops/.bashrc && \
+    echo 'echo "  DevOps Docs - Development Ready"' >> /home/devops/.bashrc && \
+    echo 'echo "════════════════════════════════════════"' >> /home/devops/.bashrc && \
+    echo 'echo ""' >> /home/devops/.bashrc && \
+    echo 'echo "Comandos disponibles:"' >> /home/devops/.bashrc && \
+    echo 'echo "  git commit    - Commitear cambios"' >> /home/devops/.bashrc && \
+    echo 'echo "  pre-commit    - Ejecutar hooks manualmente"' >> /home/devops/.bashrc && \
+    echo 'echo "  mkdocs serve  - Ver documentación local"' >> /home/devops/.bashrc && \
+    echo 'echo ""' >> /home/devops/.bashrc && \
+    echo 'echo "Nota: La documentación se genera en GitHub Actions"' >> /home/devops/.bashrc && \
+    echo 'echo "════════════════════════════════════════"' >> /home/devops/.bashrc
+
+EXPOSE 8000
+
+CMD ["/bin/bash"]
