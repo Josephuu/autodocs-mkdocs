@@ -38,6 +38,7 @@ nav:
           - Aks: terraform/modules/aks.md
           - Compute: terraform/modules/compute.md
           - Dns: terraform/modules/dns.md
+          - Keyvault: terraform/modules/keyvault.md
           - Networking: terraform/modules/networking.md
           - Storage: terraform/modules/storage.md
           - Vpc: terraform/modules/vpc.md
