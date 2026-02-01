@@ -126,7 +126,7 @@ mkdir -p "${DOCS_DIR}"
 generate_terraform_index() {
     local OUTPUT="${DOCS_DIR}/terraform/index.md"
     mkdir -p "$(dirname "$OUTPUT")"
-    
+
     echo "# Terraform" > "$OUTPUT"
     echo "" >> "$OUTPUT"
     echo "Módulos de infraestructura como código para Azure." >> "$OUTPUT"
@@ -161,7 +161,7 @@ generate_terraform_index() {
 generate_ansible_index() {
     local OUTPUT="${DOCS_DIR}/ansible/index.md"
     mkdir -p "$(dirname "$OUTPUT")"
-    
+
     echo "# Ansible" > "$OUTPUT"
     echo "" >> "$OUTPUT"
     echo "Roles para configuración de servidores." >> "$OUTPUT"
@@ -188,7 +188,7 @@ generate_ansible_index() {
 generate_kubernetes_index() {
     local OUTPUT="${DOCS_DIR}/kubernetes/index.md"
     mkdir -p "$(dirname "$OUTPUT")"
-    
+
     echo "# Kubernetes" > "$OUTPUT"
     echo "" >> "$OUTPUT"
     echo "Helm Charts para AKS." >> "$OUTPUT"
@@ -215,7 +215,7 @@ generate_kubernetes_index() {
 generate_docker_index() {
     local OUTPUT="${DOCS_DIR}/docker/index.md"
     mkdir -p "$(dirname "$OUTPUT")"
-    
+
     echo "# Docker" > "$OUTPUT"
     echo "" >> "$OUTPUT"
     echo "Aplicaciones containerizadas." >> "$OUTPUT"
@@ -242,7 +242,7 @@ generate_docker_index() {
 generate_runbooks_index() {
     local OUTPUT="${DOCS_DIR}/runbooks/index.md"
     mkdir -p "$(dirname "$OUTPUT")"
-    
+
     echo "# Runbooks" > "$OUTPUT"
     echo "" >> "$OUTPUT"
     echo "Procedimientos operacionales." >> "$OUTPUT"
@@ -330,11 +330,11 @@ repos:
       - id: terraform_fmt
       - id: terraform_validate
       - id: terraform_docs
-        args: 
+        args:
           - --hook-config=--path-to-file=README.md
           - --hook-config=--add-to-existing-file=true
           - --hook-config=--create-file-if-not-exist=true
-  
+
   - repo: local
     hooks:
       - id: generate-mkdocs-index

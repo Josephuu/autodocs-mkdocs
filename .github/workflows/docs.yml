@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -90,7 +90,7 @@ jobs:
               echo "Copied Terraform: ${name}.md"
             fi
           done
-          
+
           # Ansible
           mkdir -p docs/ansible/roles
           for f in test-project/ansible/roles/*/README.md; do
@@ -100,7 +100,7 @@ jobs:
               echo "Copied Ansible: ${name}.md"
             fi
           done
-          
+
           # Docker
           mkdir -p docs/docker/apps
           for f in test-project/docker/apps/*/README.md; do
@@ -110,7 +110,7 @@ jobs:
               echo "Copied Docker: ${name}.md"
             fi
           done
-          
+
           # Kubernetes/Helm
           mkdir -p docs/kubernetes/helm
           for f in test-project/kubernetes/helm/*/README.md; do
@@ -134,7 +134,7 @@ jobs:
               echo "- [${name}](./modules/${name}.md)" >> docs/terraform/index.md
             fi
           done
-          
+
           # Ansible index
           echo "# Ansible Roles" > docs/ansible/index.md
           echo "" >> docs/ansible/index.md
@@ -146,7 +146,7 @@ jobs:
               echo "- [${name}](./roles/${name}.md)" >> docs/ansible/index.md
             fi
           done
-          
+
           # Docker index
           echo "# Docker" > docs/docker/index.md
           echo "" >> docs/docker/index.md
@@ -158,7 +158,7 @@ jobs:
               echo "- [${name}](./apps/${name}.md)" >> docs/docker/index.md
             fi
           done
-          
+
           # Kubernetes index
           echo "# Kubernetes" > docs/kubernetes/index.md
           echo "" >> docs/kubernetes/index.md

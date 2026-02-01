@@ -1,6 +1,6 @@
 # =============================================================================
 # Dockerfile.simple - Contenedor Ligero para Desarrollo
-# 
+#
 # Este contenedor está optimizado para desarrollo local.
 # La generación de documentación se hace en GitHub Actions.
 # =============================================================================
