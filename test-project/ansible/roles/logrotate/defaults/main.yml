@@ -1,0 +1,9 @@
+---
+logrotate_app_name: myapp
+logrotate_log_path: "/var/log/myapp/*.log"
+logrotate_frequency: daily
+logrotate_rotate: 7
+logrotate_compress: true
+logrotate_delaycompress: true
+logrotate_missingok: true
+logrotate_notifempty: true

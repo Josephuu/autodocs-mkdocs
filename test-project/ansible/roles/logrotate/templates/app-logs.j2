@@ -1,0 +1,9 @@
+{{ logrotate_log_path }} {
+    {{ logrotate_frequency }}
+    rotate {{ logrotate_rotate }}
+    {% if logrotate_compress %}compress{% endif %}
+    {% if logrotate_delaycompress %}delaycompress{% endif %}
+    {% if logrotate_missingok %}missingok{% endif %}
+    {% if logrotate_notifempty %}notifempty{% endif %}
+    create 0644 root root
+}

@@ -1,0 +1,19 @@
+---
+# Configure logrotate for application logs
+
+- name: Ensure logrotate is installed
+  apt:
+    name: logrotate
+    state: present
+
+- name: Configure application logrotate
+  template:
+    src: app-logs.j2
+    dest: "/etc/logrotate.d/{{ logrotate_app_name }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Test logrotate configuration
+  command: logrotate -d /etc/logrotate.d/{{ logrotate_app_name }}
+  changed_when: false
