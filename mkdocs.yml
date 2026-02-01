@@ -35,6 +35,7 @@ nav:
           - Storage: terraform/modules/storage.md
           - Compute: terraform/modules/compute.md
           - AKS: terraform/modules/aks.md
+          - DNS: terraform/modules/dns.md
 
   - Ansible:
       - ansible/index.md
@@ -43,6 +44,7 @@ nav:
           - Database: ansible/roles/database.md
           - Monitoring: ansible/roles/monitoring.md
           - Docker: ansible/roles/docker.md
+          - Certbot: ansible/roles/certbot.md
 
   - Docker:
       - docker/index.md
