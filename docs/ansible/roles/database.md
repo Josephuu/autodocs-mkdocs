@@ -1,23 +1,35 @@
 # Ansible Role: Database
 
-Instala y configura PostgreSQL.
+Configura bases de datos PostgreSQL o MySQL.
 
 ## Requisitos
 
-- Ubuntu 20.04+
-- 2GB RAM mínimo
+- Ubuntu/Debian
+- Acceso root o sudo
 
 ## Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| postgres_version | 14 | Versión de PostgreSQL |
-| postgres_port | 5432 | Puerto |
+| Variable | Descripción | Default |
+|----------|-------------|---------|
+| `db_type` | Tipo de base de datos (postgresql/mysql) | `postgresql` |
+| `db_name` | Nombre de la base de datos | `appdb` |
+| `db_user` | Usuario de la base de datos | `appuser` |
+| `db_password` | Contraseña del usuario | `changeme` |
+| `db_port` | Puerto de conexión | `5432` |
 
-## Ejemplo
+## Ejemplo de Uso
 
 ```yaml
-- role: database
-  vars:
-    postgres_version: 15
+- hosts: databases
+  roles:
+    - role: database
+      vars:
+        db_type: postgresql
+        db_name: myapp
+        db_user: myuser
+        db_password: securepassword
 ```
+
+## Backup Automático
+
+Configura backups diarios en `/var/backups/database/`.

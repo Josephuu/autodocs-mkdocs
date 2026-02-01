@@ -2,20 +2,30 @@
 
 Configura NGINX como servidor web.
 
+## Requisitos
+
+- Ubuntu/Debian
+
 ## Variables
 
-Ver archivo defaults/main.yml para variables.
+| Variable | Descripción | Default |
+|----------|-------------|---------|
+| `nginx_port` | Puerto HTTP | `80` |
+| `nginx_ssl_port` | Puerto HTTPS | `443` |
+| `nginx_server_name` | Nombre del servidor | `_` |
+| `nginx_root` | Directorio raíz | `/var/www/html` |
 
-## Uso
+## Ejemplo de Uso
 
 ```yaml
-- role: webserver
-  vars:
-    nginx_port: 80
+- hosts: webservers
+  roles:
+    - role: webserver
+      vars:
+        nginx_port: 80
+        nginx_server_name: empresa.com
 ```
 
-## Tasks
+## SSL/TLS
 
-- Instalar NGINX
-- Configurar sitio  
-- Iniciar servicio
+Para habilitar HTTPS, combinar con el rol `certbot`.
