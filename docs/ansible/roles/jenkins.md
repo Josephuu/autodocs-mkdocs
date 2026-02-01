@@ -5,11 +5,11 @@ Instala y configura Jenkins CI/CD server.
 ## Requisitos
 
 - Ubuntu/Debian
-- Java 11 (se instala automáticamente)
+- Java 11 (se instala automaticamente)
 
 ## Variables
 
-| Variable | Descripción | Default |
+| Variable | Descripcion | Default |
 |----------|-------------|---------|
 | `jenkins_port` | Puerto de Jenkins | `8080` |
 | `jenkins_admin_user` | Usuario administrador | `admin` |
@@ -25,7 +25,7 @@ Instala y configura Jenkins CI/CD server.
         jenkins_port: 8080
 ```
 
-## Post-instalación
+## Post-instalacion
 
 1. Acceder a http://localhost:8080
 2. Obtener password inicial: `sudo cat /var/lib/jenkins/secrets/initialAdminPassword`

@@ -2,12 +2,12 @@
 
 Servidor Redis para caching en memoria.
 
-## Características
+## Caracteristicas
 
 - Redis 7 Alpine
-- Configuración optimizada para cache
+- Configuracion optimizada para cache
 - Persistencia AOF habilitada
-- Política de evicción allkeys-lru
+- Politica de eviccion allkeys-lru
 
 ## Uso
 
@@ -16,15 +16,15 @@ docker build -t redis-cache .
 docker run -p 6379:6379 redis-cache
 ```
 
-## Configuración
+## Configuracion
 
-| Parámetro | Valor | Descripción |
+| Parametro | Valor | Descripcion |
 |-----------|-------|-------------|
-| `maxmemory` | 256mb | Límite de memoria |
-| `maxmemory-policy` | allkeys-lru | Política de evicción |
+| `maxmemory` | 256mb | Limite de memoria |
+| `maxmemory-policy` | allkeys-lru | Politica de eviccion |
 | `appendonly` | yes | Persistencia AOF |
 
-## Conexión
+## Conexion
 
 ```bash
 redis-cli -h localhost -p 6379

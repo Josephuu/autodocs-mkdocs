@@ -1,8 +1,12 @@
-# Ansible
+# Ansible Roles
 
-Roles.
+Roles para configuracion de servidores.
 
 ## Roles
 
-- [database](./roles/database.md)
-- [webserver](./roles/webserver.md)
+- [certbot](./roles/certbot.md) - Certificados SSL con Let's Encrypt
+- [database](./roles/database.md) - PostgreSQL/MySQL
+- [docker](./roles/docker.md) - Instalacion Docker CE
+- [jenkins](./roles/jenkins.md) - CI/CD server
+- [monitoring](./roles/monitoring.md) - Prometheus y Grafana
+- [webserver](./roles/webserver.md) - NGINX web server

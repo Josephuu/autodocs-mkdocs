@@ -100,20 +100,30 @@ Usa la barra de búsqueda en la parte superior para encontrar cualquier informac
 Módulos reutilizables de infraestructura para Azure:
 
 - **[VPC](terraform/modules/vpc.md)** - Virtual Network y Subnets
-- **[Storage](terraform/modules/storage.md)** - Storage Accounts y Blobs
+- **[Storage](terraform/modules/storage.md)** - Storage Accounts
+- **[Compute](terraform/modules/compute.md)** - VMs y Scale Sets
+- **[AKS](terraform/modules/aks.md)** - Azure Kubernetes Service
+- **[DNS](terraform/modules/dns.md)** - DNS zones
+- **[KeyVault](terraform/modules/keyvault.md)** - Azure Key Vault
+- **[Networking](terraform/modules/networking.md)** - Network resources
 
 ### Ansible
 
 Roles para configuración automatizada:
 
 - **[Webserver](ansible/roles/webserver.md)** - NGINX web server
-- **[Database](ansible/roles/database.md)** - PostgreSQL database
+- **[Database](ansible/roles/database.md)** - PostgreSQL/MySQL
+- **[Monitoring](ansible/roles/monitoring.md)** - Prometheus y Grafana
+- **[Docker](ansible/roles/docker.md)** - Docker CE
+- **[Certbot](ansible/roles/certbot.md)** - Certificados SSL
+- **[Jenkins](ansible/roles/jenkins.md)** - CI/CD server
 
 ### Kubernetes
 
 Helm Charts para orquestación:
 
 - **[MyApp](kubernetes/helm/myapp.md)** - Aplicación principal
+- **[Nginx Ingress](kubernetes/helm/nginx-ingress.md)** - Ingress Controller
 
 ### Docker
 
@@ -121,6 +131,7 @@ Aplicaciones containerizadas:
 
 - **[Backend](docker/apps/backend.md)** - API Node.js
 - **[Frontend](docker/apps/frontend.md)** - Frontend con NGINX
+- **[Redis Cache](docker/apps/redis-cache.md)** - Redis para caching
 
 ---
 
