@@ -44,6 +44,17 @@ nav:
           - Monitoring: ansible/roles/monitoring.md
           - Docker: ansible/roles/docker.md
 
+  - Docker:
+      - docker/index.md
+      - Aplicaciones:
+          - Backend: docker/apps/backend.md
+          - Frontend: docker/apps/frontend.md
+
+  - Kubernetes:
+      - kubernetes/index.md
+      - Helm Charts:
+          - MyApp: kubernetes/helm/myapp.md
+
   - Runbooks:
       - runbooks/index.md
 

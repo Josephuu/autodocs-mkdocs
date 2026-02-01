@@ -1,3 +1,6 @@
+# Build Mkdocs
+site/
+
 # Terraform
 *.tfstate
 *.tfstate.*
@@ -17,3 +20,6 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
