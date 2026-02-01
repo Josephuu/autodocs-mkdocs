@@ -64,6 +64,17 @@ jobs:
             if [ -d "$dir/tasks" ]; then
               echo "Processing Ansible: $dir"
               (cd "$dir" && docsible --no-comments 2>/dev/null) || true
+              # Create basic README if docsible didn't create one
+              if [ ! -f "$dir/README.md" ]; then
+                role_name=$(basename "$dir")
+                echo "# Ansible Role: $role_name" > "$dir/README.md"
+                echo "" >> "$dir/README.md"
+                echo "Ansible role for $role_name configuration." >> "$dir/README.md"
+                echo "" >> "$dir/README.md"
+                echo "## Tasks" >> "$dir/README.md"
+                echo "" >> "$dir/README.md"
+                echo "- Main configuration" >> "$dir/README.md"
+              fi
             fi
           done
 
@@ -78,6 +89,24 @@ jobs:
 
       - name: Generate mkdocs.yml dynamically
         run: python3 scripts/generate-mkdocs.py
+
+      - name: Ensure Docker READMEs exist
+        run: |
+          for dir in test-project/docker/apps/*/; do
+            if [ -f "$dir/Dockerfile" ] && [ ! -f "$dir/README.md" ]; then
+              app_name=$(basename "$dir")
+              echo "Creating README for $app_name"
+              echo "# Docker App: $app_name" > "$dir/README.md"
+              echo "" >> "$dir/README.md"
+              echo "Dockerized application." >> "$dir/README.md"
+              echo "" >> "$dir/README.md"
+              echo "## Build" >> "$dir/README.md"
+              echo "" >> "$dir/README.md"
+              echo '\`\`\`bash' >> "$dir/README.md"
+              echo "docker build -t $app_name ." >> "$dir/README.md"
+              echo '\`\`\`' >> "$dir/README.md"
+            fi
+          done
 
       - name: Copy docs to site
         run: |
