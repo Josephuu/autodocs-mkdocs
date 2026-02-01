@@ -1,0 +1,20 @@
+# Default values for nginx-ingress
+replicaCount: 2
+
+image:
+  repository: nginx/nginx-ingress
+  tag: "1.25.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 80
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 250m
+    memory: 128Mi
