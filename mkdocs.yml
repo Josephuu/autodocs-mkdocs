@@ -22,8 +22,12 @@ markdown_extensions:
   - pymdownx.highlight
   - pymdownx.superfences
   - admonition
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - toc:
       permalink: true
+  - tables
 
 nav:
   - Inicio: index.md
@@ -31,20 +35,20 @@ nav:
   - Terraform:
       - terraform/index.md
       - Modulos:
-          - VPC: terraform/modules/vpc.md
-          - Storage: terraform/modules/storage.md
+          - Aks: terraform/modules/aks.md
           - Compute: terraform/modules/compute.md
-          - AKS: terraform/modules/aks.md
-          - DNS: terraform/modules/dns.md
+          - Dns: terraform/modules/dns.md
+          - Storage: terraform/modules/storage.md
+          - Vpc: terraform/modules/vpc.md
 
   - Ansible:
       - ansible/index.md
       - Roles:
-          - Webserver: ansible/roles/webserver.md
-          - Database: ansible/roles/database.md
-          - Monitoring: ansible/roles/monitoring.md
-          - Docker: ansible/roles/docker.md
           - Certbot: ansible/roles/certbot.md
+          - Database: ansible/roles/database.md
+          - Docker: ansible/roles/docker.md
+          - Monitoring: ansible/roles/monitoring.md
+          - Webserver: ansible/roles/webserver.md
 
   - Docker:
       - docker/index.md
@@ -55,7 +59,7 @@ nav:
   - Kubernetes:
       - kubernetes/index.md
       - Helm Charts:
-          - MyApp: kubernetes/helm/myapp.md
+          - Myapp: kubernetes/helm/myapp.md
 
   - Runbooks:
       - runbooks/index.md

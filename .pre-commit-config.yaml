@@ -1,7 +1,17 @@
 # Pre-commit hooks - Solo validaciones locales ligeras
-# Terraform/Ansible/Helm docs se generan en CI/CD
+# Terraform/Ansible/Helm docs y mkdocs.yml se generan en CI/CD
 
 repos:
+  # Generar mkdocs.yml dinámicamente
+  - repo: local
+    hooks:
+      - id: generate-mkdocs
+        name: Generate mkdocs.yml dynamically
+        entry: python3 scripts/generate-mkdocs.py
+        language: system
+        pass_filenames: false
+        always_run: true
+
   # Utilidades generales
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -12,9 +22,4 @@ repos:
       - id: check-added-large-files
         args: ['--maxkb=2048']
 
-  # Nota: Las validaciones de Terraform se hacen en CI/CD
-  # - repo: https://github.com/antonbabenko/pre-commit-terraform
-  #   rev: v1.88.0
-  #   hooks:
-  #     - id: terraform_fmt
-  #     - id: terraform_validate
+  # Nota: Las validaciones de Terraform/Ansible/Helm se hacen en CI/CD

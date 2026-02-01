@@ -76,6 +76,9 @@ jobs:
             fi
           done
 
+      - name: Generate mkdocs.yml dynamically
+        run: python3 scripts/generate-mkdocs.py
+
       - name: Copy docs to site
         run: |
           # Terraform
