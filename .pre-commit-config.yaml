@@ -1,24 +1,7 @@
-# Pre-commit con hooks opcionales
-# Los hooks fallan silenciosamente si la herramienta no está instalada
+# Pre-commit hooks - Solo validaciones locales ligeras
+# Terraform/Ansible/Helm docs se generan en CI/CD
 
 repos:
-  # Terraform - Solo si terraform-docs está instalado
-  - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.88.0
-    hooks:
-      - id: terraform_fmt
-      - id: terraform_validate
-      # Nota: terraform_docs requiere terraform-docs instalado
-      # Se ejecuta en GitHub Actions, no localmente
-      # - id: terraform_docs
-
-  # Markdown linting
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.39.0
-    hooks:
-      - id: markdownlint
-        args: ['--fix']
-
   # Utilidades generales
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -28,3 +11,10 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
         args: ['--maxkb=2048']
+
+  # Nota: Las validaciones de Terraform se hacen en CI/CD
+  # - repo: https://github.com/antonbabenko/pre-commit-terraform
+  #   rev: v1.88.0
+  #   hooks:
+  #     - id: terraform_fmt
+  #     - id: terraform_validate

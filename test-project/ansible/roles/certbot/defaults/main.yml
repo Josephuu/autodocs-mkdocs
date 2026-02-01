@@ -1,0 +1,6 @@
+---
+# Certbot defaults
+
+certbot_email: admin@example.com
+certbot_domain: example.com
+certbot_reload_nginx: true

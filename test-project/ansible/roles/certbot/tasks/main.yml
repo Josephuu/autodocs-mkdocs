@@ -1,0 +1,32 @@
+---
+# Certbot - SSL Certificates with Let's Encrypt
+
+- name: Install certbot
+  apt:
+    name: certbot
+    state: present
+    update_cache: yes
+
+- name: Obtain SSL certificate
+  command: >
+    certbot certonly --standalone
+    --non-interactive
+    --agree-tos
+    --email {{ certbot_email }}
+    -d {{ certbot_domain }}
+  args:
+    creates: "/etc/letsencrypt/live/{{ certbot_domain }}/fullchain.pem"
+
+- name: Setup auto-renewal cron
+  cron:
+    name: "Certbot renewal"
+    minute: "0"
+    hour: "3"
+    job: "certbot renew --quiet --deploy-hook 'systemctl reload nginx'"
+    state: present
+
+- name: Reload nginx after cert change
+  systemd:
+    name: nginx
+    state: reloaded
+  when: certbot_reload_nginx | bool
