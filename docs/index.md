@@ -1,200 +1,89 @@
-# 📚 Documentación de Infraestructura DevOps
+# Documentacion de Infraestructura DevOps
 
-Bienvenido al sistema de documentación automatizada para nuestra infraestructura.
+Bienvenido al sistema de documentacion automatizada para nuestra infraestructura.
 
-!!! success "Documentación Siempre Actualizada"
-    Esta documentación se genera automáticamente desde el código. **Garantiza 100% de sincronización** entre la infraestructura real y la documentación.
-
----
-
-## 🚀 Inicio Rápido
-
-<div class="grid cards" markdown>
-
-- :material-terraform:{ .lg .middle } **Terraform**
-
-    ---
-
-    Módulos de infraestructura como código para Azure
-
-    [:octicons-arrow-right-24: Ver Módulos](terraform/index.md)
-
-- :material-ansible:{ .lg .middle } **Ansible**
-
-    ---
-
-    Roles para gestión de configuración de servidores
-
-    [:octicons-arrow-right-24: Ver Roles](ansible/index.md)
-
-- :material-kubernetes:{ .lg .middle } **Kubernetes**
-
-    ---
-
-    Helm Charts para despliegues en AKS
-
-    [:octicons-arrow-right-24: Ver Charts](kubernetes/index.md)
-
-- :material-docker:{ .lg .middle } **Docker**
-
-    ---
-
-    Aplicaciones containerizadas
-
-    [:octicons-arrow-right-24: Ver Apps](docker/index.md)
-
-</div>
+!!! success "Documentacion Siempre Actualizada"
+    Esta documentacion se genera automaticamente desde el codigo. **Garantiza 100% de sincronizacion** entre la infraestructura real y la documentacion.
 
 ---
 
-## 📊 Stack Tecnológico
+## Inicio Rapido
 
-```mermaid
-graph TB
-    subgraph Azure["☁️ Azure Cloud"]
-        AKS[AKS Cluster]
-        VM[Virtual Machines]
-        Storage[Storage Accounts]
-        Network[Virtual Networks]
-    end
+| Seccion | Descripcion | Enlace |
+|:--------|:------------|:-------|
+| **Terraform** | Modulos de infraestructura como codigo para Azure | [Ver Modulos](terraform/index.md) |
+| **Ansible** | Roles para gestion de configuracion de servidores | [Ver Roles](ansible/index.md) |
+| **Kubernetes** | Helm Charts para despliegues en AKS | [Ver Charts](kubernetes/index.md) |
+| **Docker** | Aplicaciones containerizadas | [Ver Apps](docker/index.md) |
 
-    subgraph IaC["📦 Infrastructure as Code"]
-        TF[Terraform]
-        Ansible[Ansible]
-    end
+---
 
-    subgraph Container["🐳 Containers"]
-        Helm[Helm Charts]
-        Docker[Docker Images]
-    end
+## Stack Tecnologico
 
-    TF --> Azure
-    Ansible --> VM
-    Helm --> AKS
-    Docker --> AKS
+- **Azure Cloud**: AKS, VMs, Storage, Networking, DNS, Key Vault
+- **Infrastructure as Code**: Terraform, Ansible
+- **Containers**: Docker, Helm, Kubernetes
 
-    style Azure fill:#0078d4,color:#fff
-    style IaC fill:#7b42bc,color:#fff
-    style Container fill:#2496ed,color:#fff
+---
+
+## Modulos Terraform (7)
+
+Infraestructura como codigo para Azure:
+
+- [VPC](terraform/modules/vpc.md) - Virtual Network y Subnets
+- [Storage](terraform/modules/storage.md) - Storage Accounts
+- [Compute](terraform/modules/compute.md) - VMs y Scale Sets
+- [AKS](terraform/modules/aks.md) - Azure Kubernetes Service
+- [DNS](terraform/modules/dns.md) - DNS zones
+- [KeyVault](terraform/modules/keyvault.md) - Azure Key Vault
+- [Networking](terraform/modules/networking.md) - Network resources
+
+## Roles Ansible (6)
+
+Configuracion automatizada de servidores:
+
+- [Webserver](ansible/roles/webserver.md) - NGINX web server
+- [Database](ansible/roles/database.md) - PostgreSQL/MySQL
+- [Monitoring](ansible/roles/monitoring.md) - Prometheus y Grafana
+- [Docker](ansible/roles/docker.md) - Docker CE
+- [Certbot](ansible/roles/certbot.md) - Certificados SSL
+- [Jenkins](ansible/roles/jenkins.md) - CI/CD server
+
+## Helm Charts Kubernetes (2)
+
+Orquestacion en AKS:
+
+- [MyApp](kubernetes/helm/myapp.md) - Aplicacion principal
+- [Nginx Ingress](kubernetes/helm/nginx-ingress.md) - Ingress Controller
+
+## Apps Docker (3)
+
+Aplicaciones containerizadas:
+
+- [Backend](docker/apps/backend.md) - API Node.js
+- [Frontend](docker/apps/frontend.md) - Frontend con NGINX
+- [Redis Cache](docker/apps/redis-cache.md) - Redis para caching
+
+---
+
+## Como Contribuir
+
+!!! tip "Flujo de Trabajo"
+    1. **Escribe codigo** en `test-project/`
+    2. **Haz commit** - El CI/CD genera documentacion automaticamente
+    3. **Push** - La documentacion se publica automaticamente
+
+```bash
+# Ejemplo: Crear un nuevo modulo Terraform
+mkdir test-project/terraform/modules/mi-modulo
+# ... escribir main.tf, variables.tf, outputs.tf ...
+
+git add .
+git commit -m "feat: add mi-modulo terraform module"
+git push origin main
 ```
 
 ---
 
-## 🔍 Búsqueda
-
-Usa la barra de búsqueda en la parte superior para encontrar cualquier información rápidamente.
-
-**Ejemplos de búsqueda:**
-
-- `vpc` - Encuentra el módulo de VPC
-- `nginx` - Encuentra el rol de webserver
-- `helm` - Encuentra charts de Kubernetes
-- `dockerfile` - Encuentra configuraciones Docker
-
----
-
-## 📖 Secciones Principales
-
-### Terraform
-
-Módulos reutilizables de infraestructura para Azure:
-
-- **[VPC](terraform/modules/vpc.md)** - Virtual Network y Subnets
-- **[Storage](terraform/modules/storage.md)** - Storage Accounts
-- **[Compute](terraform/modules/compute.md)** - VMs y Scale Sets
-- **[AKS](terraform/modules/aks.md)** - Azure Kubernetes Service
-- **[DNS](terraform/modules/dns.md)** - DNS zones
-- **[KeyVault](terraform/modules/keyvault.md)** - Azure Key Vault
-- **[Networking](terraform/modules/networking.md)** - Network resources
-
-### Ansible
-
-Roles para configuración automatizada:
-
-- **[Webserver](ansible/roles/webserver.md)** - NGINX web server
-- **[Database](ansible/roles/database.md)** - PostgreSQL/MySQL
-- **[Monitoring](ansible/roles/monitoring.md)** - Prometheus y Grafana
-- **[Docker](ansible/roles/docker.md)** - Docker CE
-- **[Certbot](ansible/roles/certbot.md)** - Certificados SSL
-- **[Jenkins](ansible/roles/jenkins.md)** - CI/CD server
-
-### Kubernetes
-
-Helm Charts para orquestación:
-
-- **[MyApp](kubernetes/helm/myapp.md)** - Aplicación principal
-- **[Nginx Ingress](kubernetes/helm/nginx-ingress.md)** - Ingress Controller
-
-### Docker
-
-Aplicaciones containerizadas:
-
-- **[Backend](docker/apps/backend.md)** - API Node.js
-- **[Frontend](docker/apps/frontend.md)** - Frontend con NGINX
-- **[Redis Cache](docker/apps/redis-cache.md)** - Redis para caching
-
----
-
-## 🎯 Características del Sistema
-
-!!! tip "Generación Automática"
-    - **terraform-docs** genera documentación de módulos Terraform
-    - **docsible** genera documentación de roles Ansible
-    - **helm-docs** genera documentación de Helm charts
-    - **Pre-commit hooks** mantienen la sincronización
-
-!!! info "Diagramas Automáticos"
-    Los diagramas de arquitectura se generan automáticamente desde el código:
-
-    - Diagramas de dependencias Terraform
-    - Diagramas de servicios Docker Compose
-    - Diagramas de arquitectura Kubernetes
-
-!!! warning "Validación Continua"
-    Cada cambio es validado automáticamente:
-
-    - Sintaxis de Terraform
-    - Linting de Dockerfiles
-    - Validación de manifests Kubernetes
-    - Formato de documentación
-
----
-
-## 🤝 Contribuir
-
-Para actualizar esta documentación:
-
-1. **Modifica el código** (Terraform, Ansible, Kubernetes, Docker)
-2. **Haz commit** - Los pre-commit hooks actualizan la documentación automáticamente
-3. **Push a main** - La documentación se publica automáticamente
-
-!!! example "Ejemplo de Workflow"
-    ```bash
-    # 1. Modificar un módulo Terraform
-    vim terraform/modules/vpc/main.tf
-
-    # 2. Commit (terraform-docs se ejecuta automáticamente)
-    git add .
-    git commit -m "feat: add new subnet"
-
-    # 3. Push (docs se publican automáticamente)
-    git push origin main
-    ```
-
----
-
-## 📞 Soporte
-
-- **Slack**: #devops-docs
-- **Email**: <devops@empresa.com>
-- **Wiki**: [Confluence Docs](https://wiki.empresa.com/devops)
-
----
-
-## 📊 Métricas
-
-!!! success "Ahorro de Tiempo"
-    Este sistema ahorra **~32 horas/semana** al equipo al automatizar completamente la documentación.
-
-**Última actualización**: Automático en cada commit
-**Sincronización**: 100% garantizada con el código
+**Ultima actualizacion**: Automatico en cada commit  
+**Estado**: Sincronizado con el codigo fuente
