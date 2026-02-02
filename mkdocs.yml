@@ -36,6 +36,7 @@ nav:
       - terraform/index.md
       - Modulos:
           - Aks: terraform/modules/aks.md
+          - Bastion: terraform/modules/bastion.md
           - Compute: terraform/modules/compute.md
           - Dns: terraform/modules/dns.md
           - Keyvault: terraform/modules/keyvault.md
@@ -49,6 +50,8 @@ nav:
           - Certbot: ansible/roles/certbot.md
           - Database: ansible/roles/database.md
           - Docker: ansible/roles/docker.md
+          - Jenkins: ansible/roles/jenkins.md
+          - Logrotate: ansible/roles/logrotate.md
           - Monitoring: ansible/roles/monitoring.md
           - Webserver: ansible/roles/webserver.md
 
@@ -57,11 +60,15 @@ nav:
       - Aplicaciones:
           - Backend: docker/apps/backend.md
           - Frontend: docker/apps/frontend.md
+          - Redis-cache: docker/apps/redis-cache.md
+          - Static-site: docker/apps/static-site.md
 
   - Kubernetes:
       - kubernetes/index.md
       - Helm Charts:
           - Myapp: kubernetes/helm/myapp.md
+          - Nginx-ingress: kubernetes/helm/nginx-ingress.md
+          - Web-service: kubernetes/helm/web-service.md
 
   - Runbooks:
       - runbooks/index.md
